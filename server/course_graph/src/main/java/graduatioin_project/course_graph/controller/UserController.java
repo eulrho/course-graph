@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
-@RequiredArgsConstructor // UserService에 대한 멤버 사용 가능
+@RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
 
