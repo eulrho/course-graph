@@ -10,5 +10,4 @@ public class CourseGraphApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(CourseGraphApplication.class, args);
 	}
-
 }

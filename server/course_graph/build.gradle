@@ -21,17 +21,30 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'com.mysql:mysql-connector-j'
-	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	// sprint security
+//	implementation 'org.springframework.security:spring-security-config:5.6.0'
 	testImplementation 'org.springframework.security:spring-security-test'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	// mysql
+	runtimeOnly 'com.mysql:mysql-connector-j'
+	// lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	// JUnit
+	testImplementation 'org.junit.jupiter:junit-jupiter'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	// JWT
+	implementation("io.jsonwebtoken:jjwt:0.9.1")
+	// javax.xml.bind.DatatypeConverter 오류 해결
+	implementation("com.sun.xml.bind:jaxb-impl:4.0.1")
+	implementation("com.sun.xml.bind:jaxb-core:4.0.1")
+	implementation("javax.xml.bind:jaxb-api:2.4.0-b180830.0359")
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 }
 
 tasks.named('test') {
