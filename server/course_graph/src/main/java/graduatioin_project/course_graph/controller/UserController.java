@@ -1,5 +1,6 @@
 package graduatioin_project.course_graph.controller;
 
+import graduatioin_project.course_graph.dto.EditDTO;
 import graduatioin_project.course_graph.dto.LoginDTO;
 import graduatioin_project.course_graph.dto.UserDTO;
 import graduatioin_project.course_graph.entity.UserEntity;
@@ -7,14 +8,8 @@ import graduatioin_project.course_graph.service.UserService;
 import graduatioin_project.course_graph.token.JwtProvider;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-//import org.springframework.web.bind.annotation.ModelAttribute;
 
 @RestController
 @RequiredArgsConstructor
@@ -66,4 +61,17 @@ public class UserController {
         return jwtToken;
     }
 
+    @PostMapping("/check-password")
+    public String checkPassword(@Valid @RequestBody EditDTO editDTO, Authentication auth) {
+        if (userService.checkUPresentPassword(auth.getName(), editDTO))
+            return "회원 정보 수정 가능";
+        return "비밀번호가 틀렸습니다.";
+    }
+
+    @PostMapping("/info-edit")
+    public String infoEdit(@RequestBody EditDTO editDTO, Authentication auth) {
+        if (!userService.edit(editDTO, auth.getName()))
+            return "회원 정보 수정에 실패했습니다.";
+        return "회원 정보 수정에 성공했습니다.";
+    }
 }

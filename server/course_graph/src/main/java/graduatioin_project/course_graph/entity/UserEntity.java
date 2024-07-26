@@ -31,4 +31,9 @@ public class UserEntity {
 
         return userEntity;
     }
+
+    public void edit(String newUPwd, int newTrId) {
+        this.uPwd = newUPwd;
+        this.trId = newTrId;
+    }
 }

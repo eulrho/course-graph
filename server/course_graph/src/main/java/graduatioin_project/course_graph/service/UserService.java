@@ -1,16 +1,19 @@
 package graduatioin_project.course_graph.service;
 
+import graduatioin_project.course_graph.dto.EditDTO;
 import graduatioin_project.course_graph.dto.LoginDTO;
 import graduatioin_project.course_graph.dto.UserDTO;
 import graduatioin_project.course_graph.entity.UserEntity;
 import graduatioin_project.course_graph.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -36,7 +39,7 @@ public class UserService implements UserDetailsService {
                 throw new IllegalStateException("학번은 20-24학년도 범위 내여야 합니다.");
             return true;
         } catch (NumberFormatException ex) {
-            System.out.println("유효하지 않은 학번입니다.");
+            System.out.println("학번은 0-9까지의 숫자로 이루어져 있어야 합니다.");
             return false;
         }
     }
@@ -86,5 +89,44 @@ public class UserService implements UserDetailsService {
                 .password(userEntity.getUPwd())
                 .roles(userEntity.getRole().toString())
                 .build();
+    }
+
+    public boolean checkUPresentPassword(String loginId, EditDTO editDTO) {
+        UserEntity userEntity = getLoginUserByUId(loginId);
+
+        if (!encoder.matches(editDTO.getUPresentPwd(), userEntity.getUPwd())) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean checkEditPassword(EditDTO editDTO) {
+        if (!editDTO.getUNewPwd().isEmpty()) {
+            if (checkUPwdDuplicate(editDTO.getUNewPwd())) {
+                return false;
+            }
+            if (!editDTO.getUNewPwd().equals(editDTO.getUNewPwdCheck())) {
+                return false;
+            }
+            int length = editDTO.getUNewPwd().length();
+
+            if (length < 4 || length > 10) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Transactional
+    public boolean edit(EditDTO editDTO, String loginId) {
+        UserEntity userEntity = getLoginUserByUId(loginId);
+
+        if (!checkEditPassword(editDTO))
+            return false;
+        if (editDTO.getUNewPwd().isEmpty())
+            userEntity.edit(userEntity.getUPwd(), editDTO.getTrId());
+        else
+            userEntity.edit(encoder.encode(editDTO.getUNewPwd()), editDTO.getTrId());
+        return true;
     }
 }
