@@ -33,6 +33,7 @@ public class SecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/login")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/info")).authenticated()
                         .requestMatchers(new AntPathRequestMatcher("/info-edit")).authenticated()
+                        .requestMatchers(new AntPathRequestMatcher("/delete")).authenticated()
                         .requestMatchers(new AntPathRequestMatcher("/admin/**")).hasRole(UserRole.ADMIN.name())
                         .anyRequest().permitAll())
                 .logout((logout) -> logout

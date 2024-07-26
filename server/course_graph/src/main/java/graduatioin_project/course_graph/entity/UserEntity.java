@@ -27,7 +27,7 @@ public class UserEntity {
         userEntity.uId = userDTO.getUId();
         userEntity.uPwd = userDTO.getUPwd();
         userEntity.trId = userDTO.getTrId();
-        userEntity.role = UserRole.ADMIN;
+        userEntity.role = UserRole.USER;
 
         return userEntity;
     }

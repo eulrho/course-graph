@@ -125,4 +125,9 @@ public class UserService implements UserDetailsService {
             userEntity.edit(encoder.encode(editDTO.getUNewPwd()), editDTO.getTrId());
         return true;
     }
+
+    @Transactional
+    public void delete(UserEntity userEntity) {
+        userRepository.delete(userEntity);
+    }
 }

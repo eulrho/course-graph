@@ -71,4 +71,14 @@ public class UserController {
             return "회원 정보 수정에 실패했습니다.";
         return "회원 정보 수정에 성공했습니다.";
     }
+
+    @PostMapping("/delete")
+    public String userDelete(@Valid @RequestBody EditDTO editDTO, Authentication auth) {
+        UserEntity userEntity = userService.getLoginUserByUId(auth.getName());
+
+        if (!userService.checkUPresentPassword(userEntity, editDTO))
+            return "비밀번호가 틀렸습니다.";
+        userService.delete(userEntity);
+        return "회원 탈퇴에 성공했습니다.";
+    }
 }
