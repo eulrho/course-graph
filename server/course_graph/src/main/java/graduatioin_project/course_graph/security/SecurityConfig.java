@@ -31,8 +31,11 @@ public class SecurityConfig {
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(new AntPathRequestMatcher("/signup"), new AntPathRequestMatcher("/login")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/sign-up")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/login")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/info")).authenticated()
+                        .requestMatchers(new AntPathRequestMatcher("/check-password")).authenticated()
+                        .requestMatchers(new AntPathRequestMatcher("/info-edit")).authenticated()
                         .requestMatchers(new AntPathRequestMatcher("/admin/**")).hasRole(UserRole.ADMIN.name())
                         .anyRequest().permitAll())
                 .logout((logout) -> logout
