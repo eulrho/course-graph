@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
-    @PostMapping("/signup")
+    @PostMapping("/sign-up")
     public String signUp(@Valid @RequestBody UserDTO userDTO) {
         if (userService.checkUIdDuplicate(userDTO.getUId())) {
             return "이미 존재하는 회원입니다.";
