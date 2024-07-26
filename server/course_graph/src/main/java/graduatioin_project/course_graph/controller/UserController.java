@@ -61,16 +61,13 @@ public class UserController {
         return jwtToken;
     }
 
-    @PostMapping("/check-password")
-    public String checkPassword(@Valid @RequestBody EditDTO editDTO, Authentication auth) {
-        if (userService.checkUPresentPassword(auth.getName(), editDTO))
-            return "회원 정보 수정 가능";
-        return "비밀번호가 틀렸습니다.";
-    }
-
     @PostMapping("/info-edit")
-    public String infoEdit(@RequestBody EditDTO editDTO, Authentication auth) {
-        if (!userService.edit(editDTO, auth.getName()))
+    public String infoEdit(@Valid @RequestBody EditDTO editDTO, Authentication auth) {
+        UserEntity userEntity = userService.getLoginUserByUId(auth.getName());
+
+        if (!userService.checkUPresentPassword(userEntity, editDTO))
+            return "현재 비밀번호가 틀렸습니다.";
+        if (!userService.edit(editDTO, userEntity))
             return "회원 정보 수정에 실패했습니다.";
         return "회원 정보 수정에 성공했습니다.";
     }

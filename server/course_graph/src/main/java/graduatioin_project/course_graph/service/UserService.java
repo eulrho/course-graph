@@ -91,9 +91,7 @@ public class UserService implements UserDetailsService {
                 .build();
     }
 
-    public boolean checkUPresentPassword(String loginId, EditDTO editDTO) {
-        UserEntity userEntity = getLoginUserByUId(loginId);
-
+    public boolean checkUPresentPassword(UserEntity userEntity, EditDTO editDTO) {
         if (!encoder.matches(editDTO.getUPresentPwd(), userEntity.getUPwd())) {
             return false;
         }
@@ -118,9 +116,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public boolean edit(EditDTO editDTO, String loginId) {
-        UserEntity userEntity = getLoginUserByUId(loginId);
-
+    public boolean edit(EditDTO editDTO, UserEntity userEntity) {
         if (!checkEditPassword(editDTO))
             return false;
         if (editDTO.getUNewPwd().isEmpty())

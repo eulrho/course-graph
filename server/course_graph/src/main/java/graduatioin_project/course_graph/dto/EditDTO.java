@@ -1,14 +1,8 @@
 package graduatioin_project.course_graph.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import graduatioin_project.course_graph.entity.UserEntity;
-import graduatioin_project.course_graph.enums.UserRole;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
 @Setter
