@@ -18,15 +18,15 @@ public class UserController {
 
     @PostMapping("/sign-up")
     public String signUp(@Valid @RequestBody UserDTO userDTO) {
-        if (userService.checkUIdDuplicate(userDTO.getUId())) {
-            return "이미 존재하는 회원입니다.";
-        } else if (!userService.checkNumUId(userDTO.getUId())) {
+        if (userService.checkUIdDuplicate(userDTO.getUserId())) {
+            return "이미 존재하는 학번입니다.";
+        } else if (!userService.checkNumUId(userDTO.getUserId())) {
             return "유효하지 않은 학번입니다.";
         }
 
-        if (!userDTO.getUPwd().equals(userDTO.getUPwdCheck())) {
+        if (!userDTO.getUserPwd().equals(userDTO.getUserPwdCheck())) {
             return "비밀번호가 일치하지 않습니다.";
-        } else if (userService.checkUPwdDuplicate(userDTO.getUPwd())) {
+        } else if (userService.checkUPwdDuplicate(userDTO.getUserPwd())) {
             return "사용할 수 없는 비밀번호입니다.";
         }
 
@@ -39,7 +39,7 @@ public class UserController {
         UserEntity userEntity = userService.getLoginUserByUId(auth.getName());
 
         return String.format("uId : %s\nrole : %s\ntrId : %d",
-                userEntity.getUId(), userEntity.getRole(), userEntity.getTrId());
+                userEntity.getUserId(), userEntity.getRole(), userEntity.getTrackId());
     }
 
     @GetMapping("/admin")
@@ -56,7 +56,7 @@ public class UserController {
             return "학번 또는 비밀번호가 틀렸습니다.";
         }
 
-        String jwtToken = JwtProvider.createToken(userEntity.getUId());
+        String jwtToken = JwtProvider.createToken(userEntity.getUserId());
 
         return jwtToken;
     }
@@ -72,7 +72,7 @@ public class UserController {
         return "회원 정보 수정에 성공했습니다.";
     }
 
-    @PostMapping("/delete")
+    @DeleteMapping("/delete")
     public String userDelete(@Valid @RequestBody EditDTO editDTO, Authentication auth) {
         UserEntity userEntity = userService.getLoginUserByUId(auth.getName());
 

@@ -5,17 +5,15 @@ import graduatioin_project.course_graph.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 @Entity
-@Setter
 @Getter
 @Table(name = "user")
 public class UserEntity {
     @Id
-    private String uId;
-    private String uPwd;
-    private int trId;
+    private String userId;
+    private String userPwd;
+    private int trackId;
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
@@ -24,16 +22,15 @@ public class UserEntity {
     public static UserEntity toUserEntity(UserDTO userDTO) {
         UserEntity userEntity = new UserEntity();
 
-        userEntity.uId = userDTO.getUId();
-        userEntity.uPwd = userDTO.getUPwd();
-        userEntity.trId = userDTO.getTrId();
-        userEntity.role = UserRole.USER;
-
+        userEntity.userId = userDTO.getUserId();
+        userEntity.userPwd = userDTO.getUserPwd();
+        userEntity.trackId = userDTO.getTrackId();
+        userEntity.role = userDTO.getRole();
         return userEntity;
     }
 
-    public void edit(String newUPwd, int newTrId) {
-        this.uPwd = newUPwd;
-        this.trId = newTrId;
+    public void edit(String newUserPwd, int newTrackId) {
+        this.userPwd = newUserPwd;
+        this.trackId = newTrackId;
     }
 }

@@ -11,9 +11,9 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class LoginDTO {
-    @JsonProperty("uId")
-    private String uId;
+    @JsonProperty("userId")
+    private String userId;
 
-    @JsonProperty("uPwd")
-    private String uPwd;
+    @JsonProperty("userPwd")
+    private String userPwd;
 }

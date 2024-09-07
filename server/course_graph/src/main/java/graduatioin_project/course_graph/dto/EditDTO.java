@@ -9,18 +9,18 @@ import lombok.*;
 @NoArgsConstructor
 @ToString
 public class EditDTO {
-    @JsonProperty("uId")
-    private String uId;
+    @JsonProperty("userId")
+    private String userId;
 
     @NotBlank(message = "현재 비밀번호를 입력해주세요.")
-    @JsonProperty("uPresentPwd")
-    private String uPresentPwd;
+    @JsonProperty("userPresentPwd")
+    private String userPresentPwd;
 
-    @JsonProperty("uNewPwd")
-    private String uNewPwd;
+    @JsonProperty("userNewPwd")
+    private String userNewPwd;
 
-    @JsonProperty("uNewPwdCheck")
-    private String uNewPwdCheck;
+    @JsonProperty("userNewPwdCheck")
+    private String userNewPwdCheck;
 
-    private int trId;
+    private int trackId;
 }
