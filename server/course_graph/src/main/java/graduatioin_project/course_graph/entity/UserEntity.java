@@ -25,7 +25,8 @@ public class UserEntity {
         userEntity.userId = userDTO.getUserId();
         userEntity.userPwd = userDTO.getUserPwd();
         userEntity.trackId = userDTO.getTrackId();
-        userEntity.role = userDTO.getRole();
+        //userEntity.role = userDTO.getRole();
+        userEntity.role = UserRole.USER;
         return userEntity;
     }
 

@@ -1,5 +1,7 @@
 package graduatioin_project.course_graph.security;
 
+import graduatioin_project.course_graph.Exception.CustomAccessDeniedHandler;
+import graduatioin_project.course_graph.Exception.CustomAuthenticationEntryPoint;
 import graduatioin_project.course_graph.enums.UserRole;
 import graduatioin_project.course_graph.token.JwtAuthenticationFilter;
 import graduatioin_project.course_graph.token.JwtProvider;
@@ -13,7 +15,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-//import org.springframework.util.AntPathMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -28,6 +29,10 @@ public class SecurityConfig {
                 .sessionManagement((sessionManagement)->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling((exceptionHandling) -> exceptionHandling
+                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint(jwtProvider))
+                        .accessDeniedHandler(new CustomAccessDeniedHandler())
+                )
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(new AntPathRequestMatcher("/sign-up")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/login")).permitAll()

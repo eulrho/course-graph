@@ -1,13 +1,13 @@
 package graduatioin_project.course_graph.controller;
 
-import graduatioin_project.course_graph.dto.EditDTO;
-import graduatioin_project.course_graph.dto.LoginDTO;
-import graduatioin_project.course_graph.dto.UserDTO;
+import graduatioin_project.course_graph.dto.*;
 import graduatioin_project.course_graph.entity.UserEntity;
 import graduatioin_project.course_graph.service.UserService;
 import graduatioin_project.course_graph.token.JwtProvider;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,68 +17,45 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/sign-up")
-    public String signUp(@Valid @RequestBody UserDTO userDTO) {
-        if (userService.checkUIdDuplicate(userDTO.getUserId())) {
-            return "이미 존재하는 학번입니다.";
-        } else if (!userService.checkNumUId(userDTO.getUserId())) {
-            return "유효하지 않은 학번입니다.";
-        }
-
-        if (!userDTO.getUserPwd().equals(userDTO.getUserPwdCheck())) {
-            return "비밀번호가 일치하지 않습니다.";
-        } else if (userService.checkUPwdDuplicate(userDTO.getUserPwd())) {
-            return "사용할 수 없는 비밀번호입니다.";
-        }
-
+    public ResponseEntity<CommonResponse> signUp(@Valid @RequestBody UserDTO userDTO) {
+        userService.checkUserIdDuplicate(userDTO.getUserId());
+        userService.checkNumUserId(userDTO.getUserId());
+        userService.checkUserPwdMatch(userDTO.getUserPwd(), userDTO.getUserPwdCheck());
+        userService.checkUserPwdDuplicate(userDTO.getUserPwd());
         userService.signUp(userDTO);
-        return "회원가입 성공";
+        return new ResponseEntity<>(new CommonResponse("회원가입에 성공했습니다."), HttpStatus.CREATED);
     }
 
     @GetMapping("/info")
-    public String userInfo(Authentication auth) {
-        UserEntity userEntity = userService.getLoginUserByUId(auth.getName());
-
-        return String.format("uId : %s\nrole : %s\ntrId : %d",
-                userEntity.getUserId(), userEntity.getRole(), userEntity.getTrackId());
+    public ResponseEntity<InfoDTO> userInfo(Authentication auth) {
+        UserEntity userEntity = userService.getLoginUserByUserId(auth.getName());
+        return new ResponseEntity<>(InfoDTO.toInfoDTO(userEntity), HttpStatus.OK);
     }
 
     @GetMapping("/admin")
-    public String adminPage() {
-        return "admin";
+    public ResponseEntity<CommonResponse> adminPage() {
+        return new ResponseEntity<>(new CommonResponse("관리자 페이지 접근 성공"), HttpStatus.OK);
     }
 
     @PostMapping("/login")
-    public String login(@Valid @RequestBody LoginDTO loginDTO) {
+    public ResponseEntity<CommonResponse> login(@Valid @RequestBody LoginDTO loginDTO) {
         UserEntity userEntity = userService.login(loginDTO);
-
-        // invalid id or password
-        if (userEntity == null) {
-            return "학번 또는 비밀번호가 틀렸습니다.";
-        }
-
         String jwtToken = JwtProvider.createToken(userEntity.getUserId());
 
-        return jwtToken;
+        return new ResponseEntity<>(new CommonResponse(jwtToken), HttpStatus.OK);
     }
 
     @PostMapping("/info-edit")
-    public String infoEdit(@Valid @RequestBody EditDTO editDTO, Authentication auth) {
-        UserEntity userEntity = userService.getLoginUserByUId(auth.getName());
-
-        if (!userService.checkUPresentPassword(userEntity, editDTO))
-            return "현재 비밀번호가 틀렸습니다.";
-        if (!userService.edit(editDTO, userEntity))
-            return "회원 정보 수정에 실패했습니다.";
-        return "회원 정보 수정에 성공했습니다.";
+    public ResponseEntity<CommonResponse> infoEdit(@Valid @RequestBody EditDTO editDTO, Authentication auth) {
+        UserEntity userEntity = userService.getLoginUserByUserId(auth.getName());
+        userService.edit(editDTO, userEntity);
+        return new ResponseEntity<>(new CommonResponse("회원 정보가 수정되었습니다."), HttpStatus.OK);
     }
 
     @DeleteMapping("/delete")
-    public String userDelete(@Valid @RequestBody EditDTO editDTO, Authentication auth) {
-        UserEntity userEntity = userService.getLoginUserByUId(auth.getName());
-
-        if (!userService.checkUPresentPassword(userEntity, editDTO))
-            return "비밀번호가 틀렸습니다.";
-        userService.delete(userEntity);
-        return "회원 탈퇴에 성공했습니다.";
+    public ResponseEntity<CommonResponse> userDelete(String userPwd, Authentication auth) {
+        UserEntity userEntity = userService.getLoginUserByUserId(auth.getName());
+        userService.delete(userPwd, userEntity);
+        return new ResponseEntity<>(new CommonResponse("회원 탈퇴되었습니다."), HttpStatus.OK);
     }
 }

@@ -45,33 +45,30 @@ public class JwtProvider {
     }
 
     public Authentication getAuthentication(String token) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(this.getUId(token));
+        token = token.split(" ")[1].trim();
+        UserDetails userDetails = userDetailsService.loadUserByUsername(this.getUserId(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
-    public String getUId(String token) {
+    public String getUserId(String token) {
+
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
 
     public boolean validateToken(String jwt) {
-        try {
-            if (!jwt.substring(0, "BEARER ".length()).equalsIgnoreCase("BEARER ")) {
-                return false;
-            }
-            else {
-                jwt = jwt.split(" ")[1].trim();
-            }
+        if (!jwt.substring(0, "BEARER ".length()).equalsIgnoreCase("BEARER "))
+            return false;
+        return !isExpired(jwt);
+    }
 
+    public boolean isExpired(String jwt) {
+        try {
+            jwt = jwt.split(" ")[1].trim();
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwt);
-            return !claims.getBody().getExpiration().before(new Date());
+            return claims.getBody().getExpiration().before(new Date());
         }
-        catch(ExpiredJwtException e) {
-            log.error("Token Expired");
-            return false;
-        }
-        catch(JwtException e) {
-            log.error("Token Error");
-            return false;
+        catch(Exception e) {
+            return true;
         }
     }
 

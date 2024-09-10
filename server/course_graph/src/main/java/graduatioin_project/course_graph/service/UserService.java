@@ -1,12 +1,13 @@
 package graduatioin_project.course_graph.service;
 
+import graduatioin_project.course_graph.Exception.RestApiException;
 import graduatioin_project.course_graph.dto.EditDTO;
 import graduatioin_project.course_graph.dto.LoginDTO;
 import graduatioin_project.course_graph.dto.UserDTO;
 import graduatioin_project.course_graph.entity.UserEntity;
+import graduatioin_project.course_graph.enums.CustomErrorCode;
 import graduatioin_project.course_graph.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -24,110 +25,90 @@ public class UserService implements UserDetailsService {
     private final BCryptPasswordEncoder encoder;
 
     public void signUp(UserDTO userDTO) {
-        userDTO.setUPwd(encoder.encode(userDTO.getUPwd()));
+        userDTO.setUserPwd(encoder.encode(userDTO.getUserPwd()));
         UserEntity userEntity = UserEntity.toUserEntity(userDTO);
         userRepository.save(userEntity);
     }
 
-    public boolean checkNumUId(String uId) {
-        try {
-            Integer.parseInt(uId);
+    public void checkNumUserId(String uId) {
+        Integer.parseInt(uId);
 
-            int tempInt = Integer.parseInt(uId.substring(0, 2));
+        int tempInt = Integer.parseInt(uId.substring(0, 2));
 
-            if (!(tempInt >= 20 && tempInt <= 24))
-                throw new IllegalStateException("학번은 20-24학년도 범위 내여야 합니다.");
-            return true;
-        } catch (NumberFormatException ex) {
-            System.out.println("학번은 0-9까지의 숫자로 이루어져 있어야 합니다.");
-            return false;
-        }
+        if (!(tempInt >= 20 && tempInt <= 24))
+            throw new RestApiException(CustomErrorCode.OUT_OF_BOUND_USER_ID);
     }
 
-    public boolean checkUIdDuplicate(String uId)
+    public void checkUserIdDuplicate(String userId)
     {
-        return userRepository.findByuId(uId).isPresent();
+        userRepository.findByUserId(userId).ifPresent(m -> {
+            throw new RestApiException(CustomErrorCode.DUPLICATE_USER_ID);});
     }
 
-    public boolean checkUPwdDuplicate(String uPwd)
+    public void checkUserPwdMatch(String userPwd, String userPwdCheck)
     {
-        return userRepository.findByuPwd(uPwd).isPresent();
+        if (!userPwd.equals(userPwdCheck))
+            throw new RestApiException(CustomErrorCode.INVALID_USER_PASSWORD);
+    }
+
+    public void checkUserPwdDuplicate(String userPwd)
+    {
+        userRepository.findByUserPwd(userPwd).ifPresent(m -> {
+            throw new RestApiException(CustomErrorCode.DUPLICATE_USER_PASSWORD);});
     }
 
     public UserEntity login(LoginDTO loginDTO) {
-        Optional<UserEntity> optionalUser = userRepository.findByuId(loginDTO.getUId());
-        if (optionalUser.isEmpty()) {
-            return null;
-        }
+        Optional<UserEntity> optionalUser = userRepository.findByUserId(loginDTO.getUserId());
+        if (optionalUser.isEmpty())
+            throw new RestApiException(CustomErrorCode.NO_MATCH_USER_ID);
 
         UserEntity userEntity = optionalUser.get();
-        if (!encoder.matches(loginDTO.getUPwd(), userEntity.getUPwd())) {
-            return null;
-        }
-
+        checkUserPresentPassword(loginDTO.getUserPwd(), userEntity.getUserPwd());
         return userEntity;
     }
 
-    public UserEntity getLoginUserByUId(String uId) {
-        if (uId == null) return null;
+    public UserEntity getLoginUserByUserId(String userId) {
+        if (userId == null) return null;
 
-        Optional<UserEntity> optionalUser = userRepository.findByuId(uId);
+        Optional<UserEntity> optionalUser = userRepository.findByUserId(userId);
         if (optionalUser.isEmpty()) return null;
 
         return optionalUser.get();
     }
 
     @Override
-    public UserDetails loadUserByUsername(String uId) throws UsernameNotFoundException {
-        UserEntity userEntity = getLoginUserByUId(uId);
+    public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
+        UserEntity userEntity = getLoginUserByUserId(userId);
 
         if (userEntity == null) {
-            throw new UsernameNotFoundException(uId);
+            throw new UsernameNotFoundException(userId);
         }
         return User.builder()
-                .username(userEntity.getUId())
-                .password(userEntity.getUPwd())
+                .username(userEntity.getUserId())
+                .password(userEntity.getUserPwd())
                 .roles(userEntity.getRole().toString())
                 .build();
     }
 
-    public boolean checkUPresentPassword(UserEntity userEntity, EditDTO editDTO) {
-        if (!encoder.matches(editDTO.getUPresentPwd(), userEntity.getUPwd())) {
-            return false;
-        }
-        return true;
-    }
-
-    public boolean checkEditPassword(EditDTO editDTO) {
-        if (!editDTO.getUNewPwd().isEmpty()) {
-            if (checkUPwdDuplicate(editDTO.getUNewPwd())) {
-                return false;
-            }
-            if (!editDTO.getUNewPwd().equals(editDTO.getUNewPwdCheck())) {
-                return false;
-            }
-            int length = editDTO.getUNewPwd().length();
-
-            if (length < 4 || length > 10) {
-                return false;
-            }
-        }
-        return true;
+    public void checkUserPresentPassword(String userPwd, String encodedPwd) {
+        if (!encoder.matches(userPwd, encodedPwd))
+            throw new RestApiException(CustomErrorCode.NO_MATCH_USER_PASSWORD);
     }
 
     @Transactional
-    public boolean edit(EditDTO editDTO, UserEntity userEntity) {
-        if (!checkEditPassword(editDTO))
-            return false;
-        if (editDTO.getUNewPwd().isEmpty())
-            userEntity.edit(userEntity.getUPwd(), editDTO.getTrId());
-        else
-            userEntity.edit(encoder.encode(editDTO.getUNewPwd()), editDTO.getTrId());
-        return true;
+    public void edit(EditDTO editDTO, UserEntity userEntity) {
+        checkUserPresentPassword(editDTO.getUserPresentPwd(), userEntity.getUserPwd());
+        if (!editDTO.getUserNewPwd().isEmpty()) {
+            checkUserPwdMatch(editDTO.getUserNewPwd(), editDTO.getUserNewPwdCheck());
+            checkUserPwdDuplicate(editDTO.getUserNewPwd());
+            userEntity.edit(encoder.encode(editDTO.getUserNewPwd()), editDTO.getTrackId());
+        }
+        else userEntity.edit(userEntity.getUserPwd(), editDTO.getTrackId());
     }
 
     @Transactional
-    public void delete(UserEntity userEntity) {
+    public void delete(String userPwd, UserEntity userEntity) {
+        checkUserPresentPassword(userPwd, userEntity.getUserPwd());
         userRepository.delete(userEntity);
     }
 }

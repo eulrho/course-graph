@@ -45,6 +45,8 @@ dependencies {
 	implementation("com.sun.xml.bind:jaxb-core:4.0.1")
 	implementation("javax.xml.bind:jaxb-api:2.4.0-b180830.0359")
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	// JSON
+	implementation 'com.googlecode.json-simple:json-simple:1.1'
 }
 
 tasks.named('test') {
