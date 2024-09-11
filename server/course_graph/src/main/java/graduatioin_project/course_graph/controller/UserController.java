@@ -41,7 +41,6 @@ public class UserController {
     public ResponseEntity<CommonResponse> login(@Valid @RequestBody LoginDTO loginDTO) {
         UserEntity userEntity = userService.login(loginDTO);
         String jwtToken = JwtProvider.createToken(userEntity.getUserId());
-
         return new ResponseEntity<>(new CommonResponse(jwtToken), HttpStatus.OK);
     }
 
@@ -53,9 +52,9 @@ public class UserController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<CommonResponse> userDelete(String userPwd, Authentication auth) {
+    public ResponseEntity<CommonResponse> userDelete(@RequestBody DeleteRequest deleteRequest, Authentication auth) {
         UserEntity userEntity = userService.getLoginUserByUserId(auth.getName());
-        userService.delete(userPwd, userEntity);
+        userService.delete(deleteRequest.getUserPwd(), userEntity);
         return new ResponseEntity<>(new CommonResponse("회원 탈퇴되었습니다."), HttpStatus.OK);
     }
 }

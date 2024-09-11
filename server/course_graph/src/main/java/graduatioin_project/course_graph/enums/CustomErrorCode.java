@@ -20,7 +20,7 @@ public enum CustomErrorCode implements ErrorCode {
     INVALID_USER_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
     DUPLICATE_USER_PASSWORD(HttpStatus.CONFLICT, "사용할 수 없는 비밀번호입니다."),
     NO_MATCH_USER_ID(HttpStatus.BAD_REQUEST, "학번이 일치하지 않습니다."),
-    NO_MATCH_USER_PASSWORD(HttpStatus.BAD_REQUEST, "현재 비밀번호와 일치하지 않습니다."),
+    NO_MATCH_USER_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
     OUT_OF_BOUND_USER_ID(HttpStatus.BAD_REQUEST, "학번은 20-24학년도 범위 내여야 합니다.");
 
     private final HttpStatus httpStatus;
