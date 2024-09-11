@@ -5,6 +5,6 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class DeleteRequest {
+public class DeleteDTO {
     private String userPwd;
 }
