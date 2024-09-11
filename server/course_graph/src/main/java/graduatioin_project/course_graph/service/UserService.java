@@ -31,10 +31,14 @@ public class UserService implements UserDetailsService {
     }
 
     public void checkNumUserId(String uId) {
-        Integer.parseInt(uId);
 
+        try {
+            Long.parseLong(uId);
+        }
+        catch (NumberFormatException e) {
+            throw new RestApiException(CustomErrorCode.INVALID_USER_ID);
+        }
         int tempInt = Integer.parseInt(uId.substring(0, 2));
-
         if (!(tempInt >= 20 && tempInt <= 24))
             throw new RestApiException(CustomErrorCode.OUT_OF_BOUND_USER_ID);
     }

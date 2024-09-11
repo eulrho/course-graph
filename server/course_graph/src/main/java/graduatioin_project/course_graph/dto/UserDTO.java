@@ -29,14 +29,12 @@ public class UserDTO {
     @JsonProperty("userPwdCheck")
     private String userPwdCheck;
     private int trackId;
-    private UserRole role;
 
     public static UserDTO toUserDTO(UserEntity userEntity) {
         UserDTO userDTO = new UserDTO();
         userDTO.setUserId(userEntity.getUserId());
         userDTO.setUserPwd(userEntity.getUserPwd());
         userDTO.setTrackId(userEntity.getTrackId());
-        userDTO.setRole(userEntity.getRole());
         return userDTO;
     }
 }
