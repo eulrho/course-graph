@@ -25,7 +25,10 @@ public class InfoDTO {
     public static List<InfoDTO> toInfoDTOList(List<UserEntity> userEntityList) {
         List<InfoDTO> infoDTOList = new ArrayList<>();
         for (UserEntity userEntity : userEntityList) {
-            infoDTOList.add(toInfoDTO(userEntity));
+            InfoDTO infoDTO = toInfoDTO(userEntity);
+            if (infoDTO.getUserId().equals("admin"))
+                continue;
+            infoDTOList.add(infoDTO);
         }
         return infoDTOList;
     }
