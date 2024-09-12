@@ -2,6 +2,7 @@ package graduatioin_project.course_graph.service;
 
 import graduatioin_project.course_graph.Exception.RestApiException;
 import graduatioin_project.course_graph.dto.EditRequest;
+import graduatioin_project.course_graph.dto.InfoDTO;
 import graduatioin_project.course_graph.dto.LoginRequest;
 import graduatioin_project.course_graph.dto.UserDTO;
 import graduatioin_project.course_graph.entity.UserEntity;
@@ -16,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -121,5 +123,11 @@ public class UserService implements UserDetailsService {
     public void delete(String userPwd, UserEntity userEntity) {
         checkUserPresentPassword(userPwd, userEntity.getUserPwd());
         userRepository.delete(userEntity);
+    }
+
+    public List<InfoDTO> getAllUser() {
+        List<UserEntity> userEntityList = userRepository.findAll();
+        List<InfoDTO> infoDTOList = InfoDTO.toInfoDTOList(userEntityList);
+        return infoDTOList;
     }
 }

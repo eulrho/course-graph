@@ -11,12 +11,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
 
-    @PostMapping("/sign-up")
+    @PostMapping("/user/sign-up")
     public ResponseEntity<CommonResponse> signUp(@Valid @RequestBody UserDTO userDTO) {
         userService.checkUserIdDuplicate(userDTO.getUserId());
         userService.checkNumUserId(userDTO.getUserId());
@@ -25,32 +27,33 @@ public class UserController {
         return new ResponseEntity<>(new CommonResponse("회원가입에 성공했습니다."), HttpStatus.CREATED);
     }
 
-    @GetMapping("/info")
+    @GetMapping("/user/info")
     public ResponseEntity<InfoDTO> userInfo(Authentication auth) {
         UserEntity userEntity = userService.getLoginUserByUserId(auth.getName());
         return new ResponseEntity<>(InfoDTO.toInfoDTO(userEntity), HttpStatus.OK);
     }
 
-    @GetMapping("/admin")
-    public ResponseEntity<CommonResponse> adminPage() {
-        return new ResponseEntity<>(new CommonResponse("관리자 페이지 접근 성공"), HttpStatus.OK);
+    @GetMapping("/user/admin")
+    public ResponseEntity<List<InfoDTO>> adminPage() {
+        List<InfoDTO> userList = userService.getAllUser();
+        return new ResponseEntity<>(userList, HttpStatus.OK);
     }
 
-    @PostMapping("/login")
+    @PostMapping("/user/login")
     public ResponseEntity<CommonResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
         UserEntity userEntity = userService.login(loginRequest);
         String jwtToken = JwtProvider.createToken(userEntity.getUserId());
         return new ResponseEntity<>(new CommonResponse(jwtToken), HttpStatus.OK);
     }
 
-    @PostMapping("/info-edit")
+    @PostMapping("/user/info-edit")
     public ResponseEntity<CommonResponse> infoEdit(@Valid @RequestBody EditRequest editRequest, Authentication auth) {
         UserEntity userEntity = userService.getLoginUserByUserId(auth.getName());
         userService.edit(editRequest, userEntity);
         return new ResponseEntity<>(new CommonResponse("회원 정보가 수정되었습니다."), HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/user/delete")
     public ResponseEntity<CommonResponse> userDelete(@Valid @RequestBody DeleteRequest deleteRequest, Authentication auth) {
         UserEntity userEntity = userService.getLoginUserByUserId(auth.getName());
         userService.delete(deleteRequest.getUserPwd(), userEntity);

@@ -34,16 +34,13 @@ public class SecurityConfig {
                         .accessDeniedHandler(new CustomAccessDeniedHandler())
                 )
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(new AntPathRequestMatcher("/sign-up")).permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/login")).permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/info")).authenticated()
-                        .requestMatchers(new AntPathRequestMatcher("/info-edit")).authenticated()
-                        .requestMatchers(new AntPathRequestMatcher("/delete")).authenticated()
-                        .requestMatchers(new AntPathRequestMatcher("/admin/**")).hasRole(UserRole.ADMIN.name())
-                        .anyRequest().permitAll())
+                        .requestMatchers(new AntPathRequestMatcher("/user/sign-up")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/user/login")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/user/admin/**")).hasRole(UserRole.ADMIN.name())
+                        .anyRequest().authenticated())
                 .logout((logout) -> logout
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                        .logoutSuccessUrl("/")
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/user/logout"))
+                        .logoutSuccessUrl("/user/login")
                         );
         return http.build();
     }

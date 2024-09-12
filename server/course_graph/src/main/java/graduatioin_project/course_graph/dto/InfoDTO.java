@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Setter
 @Getter
 @RequiredArgsConstructor
@@ -17,5 +20,13 @@ public class InfoDTO {
         infoDTO.setUserId(userEntity.getUserId());
         infoDTO.setTrackId(userEntity.getTrackId());
         return infoDTO;
+    }
+
+    public static List<InfoDTO> toInfoDTOList(List<UserEntity> userEntityList) {
+        List<InfoDTO> infoDTOList = new ArrayList<>();
+        for (UserEntity userEntity : userEntityList) {
+            infoDTOList.add(toInfoDTO(userEntity));
+        }
+        return infoDTOList;
     }
 }
