@@ -38,7 +38,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             HttpStatusCode status,
             WebRequest request) {
         ErrorCode errorCode = CustomErrorCode.INVALID_PARAMETER;
-        return handleExceptionInternal(errorCode, e.getMessage());
+        //return handleExceptionInternal(errorCode, e.getMessage());
+        return handleExceptionInternal(errorCode);
     }
 
     @ExceptionHandler({Exception.class})

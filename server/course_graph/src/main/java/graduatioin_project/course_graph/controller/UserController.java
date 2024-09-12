@@ -51,7 +51,7 @@ public class UserController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<CommonResponse> userDelete(@RequestBody DeleteDTO deleteDTO, Authentication auth) {
+    public ResponseEntity<CommonResponse> userDelete(@Valid @RequestBody DeleteDTO deleteDTO, Authentication auth) {
         UserEntity userEntity = userService.getLoginUserByUserId(auth.getName());
         userService.delete(deleteDTO.getUserPwd(), userEntity);
         return new ResponseEntity<>(new CommonResponse("회원 탈퇴되었습니다."), HttpStatus.OK);
