@@ -13,10 +13,8 @@ import lombok.ToString;
 @ToString
 public class LoginDTO {
     @NotBlank(message = "학번을 입력해주세요.")
-    @JsonProperty("userId")
     private String userId;
 
     @NotBlank(message = "비밀번호를 입력해주세요.")
-    @JsonProperty("userPwd")
     private String userPwd;
 }

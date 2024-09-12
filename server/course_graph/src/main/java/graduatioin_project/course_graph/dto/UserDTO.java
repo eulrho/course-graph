@@ -1,6 +1,5 @@
 package graduatioin_project.course_graph.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import graduatioin_project.course_graph.entity.UserEntity;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -16,16 +15,13 @@ import lombok.ToString;
 public class UserDTO {
     @NotBlank(message = "학번을 입력해주세요.")
     @Size(min = 10, max = 10, message = "학번은 10자여야 합니다.")
-    @JsonProperty("userId")
     private String userId;
 
     @NotBlank(message = "비밀번호를 입력해주세요.")
     @Size(min = 4, max = 10, message = "비밀번호는 4-10자여야 합니다.")
-    @JsonProperty("userPwd")
     private String userPwd;
 
     @NotBlank(message = "비밀번호를 다시 입력해주세요.")
-    @JsonProperty("userPwdCheck")
     private String userPwdCheck;
     private int trackId;
 
