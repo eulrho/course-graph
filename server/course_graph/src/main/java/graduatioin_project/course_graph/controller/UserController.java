@@ -30,12 +30,12 @@ public class UserController {
     @GetMapping("/user/info")
     public ResponseEntity<InfoDTO> userInfo(Authentication auth) {
         UserEntity userEntity = userService.getLoginUserByUserId(auth.getName());
-        return new ResponseEntity<>(InfoDTO.toInfoDTO(userEntity), HttpStatus.OK);
+        return new ResponseEntity<>(userService.getUserInfo(userEntity), HttpStatus.OK);
     }
 
     @GetMapping("/user/admin")
     public ResponseEntity<List<InfoDTO>> adminPage() {
-        List<InfoDTO> userList = userService.getAllUser();
+        List<InfoDTO> userList = userService.getAllUserInfo();
         return new ResponseEntity<>(userList, HttpStatus.OK);
     }
 

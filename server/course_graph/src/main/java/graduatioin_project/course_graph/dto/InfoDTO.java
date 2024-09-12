@@ -1,35 +1,20 @@
 package graduatioin_project.course_graph.dto;
 
-import graduatioin_project.course_graph.entity.UserEntity;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Setter
 @Getter
 @RequiredArgsConstructor
 public class InfoDTO {
     private String userId;
-    private int trackId;
+    private String trackName;
 
-    public static InfoDTO toInfoDTO(UserEntity userEntity) {
+    public static InfoDTO toInfoDTO(String userID, String trackName) {
         InfoDTO infoDTO = new InfoDTO();
-        infoDTO.setUserId(userEntity.getUserId());
-        infoDTO.setTrackId(userEntity.getTrackId());
+        infoDTO.setUserId(userID);
+        infoDTO.setTrackName(trackName);
         return infoDTO;
-    }
-
-    public static List<InfoDTO> toInfoDTOList(List<UserEntity> userEntityList) {
-        List<InfoDTO> infoDTOList = new ArrayList<>();
-        for (UserEntity userEntity : userEntityList) {
-            InfoDTO infoDTO = toInfoDTO(userEntity);
-            if (infoDTO.getUserId().equals("admin"))
-                continue;
-            infoDTOList.add(infoDTO);
-        }
-        return infoDTOList;
     }
 }

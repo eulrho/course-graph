@@ -5,8 +5,10 @@ import graduatioin_project.course_graph.dto.EditRequest;
 import graduatioin_project.course_graph.dto.InfoDTO;
 import graduatioin_project.course_graph.dto.LoginRequest;
 import graduatioin_project.course_graph.dto.UserDTO;
+import graduatioin_project.course_graph.entity.TrackEntity;
 import graduatioin_project.course_graph.entity.UserEntity;
 import graduatioin_project.course_graph.enums.CustomErrorCode;
+import graduatioin_project.course_graph.repository.TrackRepository;
 import graduatioin_project.course_graph.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
@@ -17,6 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +28,7 @@ import java.util.Optional;
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder encoder;
+    private final TrackRepository trackRepository;
 
     public void signUp(UserDTO userDTO) {
         userDTO.setUserPwd(encoder.encode(userDTO.getUserPwd()));
@@ -125,9 +129,27 @@ public class UserService implements UserDetailsService {
         userRepository.delete(userEntity);
     }
 
-    public List<InfoDTO> getAllUser() {
+    public List<InfoDTO> getAllUserInfo() {
         List<UserEntity> userEntityList = userRepository.findAll();
-        List<InfoDTO> infoDTOList = InfoDTO.toInfoDTOList(userEntityList);
+        List<InfoDTO> infoDTOList = new ArrayList<>();
+
+        for (UserEntity userEntity : userEntityList) {
+            InfoDTO infoDTO = getUserInfo(userEntity);
+            if (infoDTO.getUserId().equals("admin"))
+                continue;
+            infoDTOList.add(infoDTO);
+        }
         return infoDTOList;
+    }
+
+    public String getUserTrackName(int trackId) {
+        Optional<TrackEntity> optionalTrackEntity = trackRepository.findByTrackId(trackId);
+        if (optionalTrackEntity.isEmpty())
+            throw new RestApiException(CustomErrorCode.INVALID_PARAMETER);
+        return optionalTrackEntity.get().getTrackName();
+    }
+
+    public InfoDTO getUserInfo(UserEntity userEntity) {
+        return InfoDTO.toInfoDTO(userEntity.getUserId(), getUserTrackName(userEntity.getTrackId()));
     }
 }
