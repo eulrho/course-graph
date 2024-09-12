@@ -11,8 +11,13 @@ import lombok.Getter;
 @Table(name = "user")
 public class UserEntity {
     @Id
+    @Column(name = "user_id", length = 10)
     private String userId;
+
+    @Column(name = "user_pwd")
     private String userPwd;
+
+    @Column(name = "track_id")
     private int trackId;
 
     @Enumerated(EnumType.STRING)
