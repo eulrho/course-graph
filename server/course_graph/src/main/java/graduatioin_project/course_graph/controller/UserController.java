@@ -21,7 +21,6 @@ public class UserController {
         userService.checkUserIdDuplicate(userDTO.getUserId());
         userService.checkNumUserId(userDTO.getUserId());
         userService.checkUserPwdMatch(userDTO.getUserPwd(), userDTO.getUserPwdCheck());
-        userService.checkUserPwdDuplicate(userDTO.getUserPwd());
         userService.signUp(userDTO);
         return new ResponseEntity<>(new CommonResponse("회원가입에 성공했습니다."), HttpStatus.CREATED);
     }

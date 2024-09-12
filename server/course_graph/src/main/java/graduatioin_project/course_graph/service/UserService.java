@@ -55,10 +55,10 @@ public class UserService implements UserDetailsService {
             throw new RestApiException(CustomErrorCode.NO_MATCH_USER_PASSWORD);
     }
 
-    public void checkUserPwdDuplicate(String userPwd)
+    public void checkUserPwdDuplicate(String userPwd, String userNewPwd)
     {
-        userRepository.findByUserPwd(userPwd).ifPresent(m -> {
-            throw new RestApiException(CustomErrorCode.DUPLICATE_USER_PASSWORD);});
+        if (userPwd.equals(userNewPwd))
+            throw new RestApiException(CustomErrorCode.DUPLICATE_USER_PASSWORD);
     }
 
     public void checkUserPwdLength(String userPwd)
@@ -111,7 +111,7 @@ public class UserService implements UserDetailsService {
         if (!editDTO.getUserNewPwd().isEmpty()) {
             checkUserPwdLength(editDTO.getUserNewPwd());
             checkUserPwdMatch(editDTO.getUserNewPwd(), editDTO.getUserNewPwdCheck());
-            checkUserPwdDuplicate(editDTO.getUserNewPwd());
+            checkUserPwdDuplicate(editDTO.getUserPresentPwd(), editDTO.getUserNewPwd());
             userEntity.edit(encoder.encode(editDTO.getUserNewPwd()), editDTO.getTrackId());
         }
         else userEntity.edit(userEntity.getUserPwd(), editDTO.getTrackId());
