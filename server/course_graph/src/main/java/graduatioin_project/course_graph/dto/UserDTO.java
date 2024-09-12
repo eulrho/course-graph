@@ -13,15 +13,15 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class UserDTO {
-    @NotBlank(message = "학번을 입력해주세요.")
+    @NotBlank
     @Size(min = 10, max = 10, message = "학번은 10자여야 합니다.")
     private String userId;
 
-    @NotBlank(message = "비밀번호를 입력해주세요.")
+    @NotBlank
     @Size(min = 4, max = 10, message = "비밀번호는 4-10자여야 합니다.")
     private String userPwd;
 
-    @NotBlank(message = "비밀번호를 다시 입력해주세요.")
+    @NotBlank
     private String userPwdCheck;
     private int trackId;
 

@@ -1,8 +1,8 @@
 package graduatioin_project.course_graph.service;
 
 import graduatioin_project.course_graph.Exception.RestApiException;
-import graduatioin_project.course_graph.dto.EditDTO;
-import graduatioin_project.course_graph.dto.LoginDTO;
+import graduatioin_project.course_graph.dto.EditRequest;
+import graduatioin_project.course_graph.dto.LoginRequest;
 import graduatioin_project.course_graph.dto.UserDTO;
 import graduatioin_project.course_graph.entity.UserEntity;
 import graduatioin_project.course_graph.enums.CustomErrorCode;
@@ -67,13 +67,13 @@ public class UserService implements UserDetailsService {
             throw new RestApiException(CustomErrorCode.INVALID_USER_PASSWORD);
     }
 
-    public UserEntity login(LoginDTO loginDTO) {
-        Optional<UserEntity> optionalUser = userRepository.findByUserId(loginDTO.getUserId());
+    public UserEntity login(LoginRequest loginRequest) {
+        Optional<UserEntity> optionalUser = userRepository.findByUserId(loginRequest.getUserId());
         if (optionalUser.isEmpty())
             throw new RestApiException(CustomErrorCode.NO_MATCH_USER_ID);
 
         UserEntity userEntity = optionalUser.get();
-        checkUserPresentPassword(loginDTO.getUserPwd(), userEntity.getUserPwd());
+        checkUserPresentPassword(loginRequest.getUserPwd(), userEntity.getUserPwd());
         return userEntity;
     }
 
@@ -106,15 +106,15 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public void edit(EditDTO editDTO, UserEntity userEntity) {
-        checkUserPresentPassword(editDTO.getUserPresentPwd(), userEntity.getUserPwd());
-        if (!editDTO.getUserNewPwd().isEmpty()) {
-            checkUserPwdLength(editDTO.getUserNewPwd());
-            checkUserPwdMatch(editDTO.getUserNewPwd(), editDTO.getUserNewPwdCheck());
-            checkUserPwdDuplicate(editDTO.getUserPresentPwd(), editDTO.getUserNewPwd());
-            userEntity.edit(encoder.encode(editDTO.getUserNewPwd()), editDTO.getTrackId());
+    public void edit(EditRequest editRequest, UserEntity userEntity) {
+        checkUserPresentPassword(editRequest.getUserPresentPwd(), userEntity.getUserPwd());
+        if (!editRequest.getUserNewPwd().isEmpty()) {
+            checkUserPwdLength(editRequest.getUserNewPwd());
+            checkUserPwdMatch(editRequest.getUserNewPwd(), editRequest.getUserNewPwdCheck());
+            checkUserPwdDuplicate(editRequest.getUserPresentPwd(), editRequest.getUserNewPwd());
+            userEntity.edit(encoder.encode(editRequest.getUserNewPwd()), editRequest.getTrackId());
         }
-        else userEntity.edit(userEntity.getUserPwd(), editDTO.getTrackId());
+        else userEntity.edit(userEntity.getUserPwd(), editRequest.getTrackId());
     }
 
     @Transactional

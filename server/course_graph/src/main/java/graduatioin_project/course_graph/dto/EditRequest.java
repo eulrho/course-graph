@@ -1,6 +1,5 @@
 package graduatioin_project.course_graph.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
@@ -8,7 +7,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @ToString
-public class EditDTO {
+public class EditRequest {
     private String userId;
 
     @NotBlank(message = "현재 비밀번호를 입력해주세요.")

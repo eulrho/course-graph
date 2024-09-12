@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class DeleteDTO {
+public class DeleteRequest {
     @NotBlank
     private String userPwd;
 }

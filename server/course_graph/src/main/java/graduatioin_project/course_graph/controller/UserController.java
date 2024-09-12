@@ -37,23 +37,23 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<CommonResponse> login(@Valid @RequestBody LoginDTO loginDTO) {
-        UserEntity userEntity = userService.login(loginDTO);
+    public ResponseEntity<CommonResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
+        UserEntity userEntity = userService.login(loginRequest);
         String jwtToken = JwtProvider.createToken(userEntity.getUserId());
         return new ResponseEntity<>(new CommonResponse(jwtToken), HttpStatus.OK);
     }
 
     @PostMapping("/info-edit")
-    public ResponseEntity<CommonResponse> infoEdit(@Valid @RequestBody EditDTO editDTO, Authentication auth) {
+    public ResponseEntity<CommonResponse> infoEdit(@Valid @RequestBody EditRequest editRequest, Authentication auth) {
         UserEntity userEntity = userService.getLoginUserByUserId(auth.getName());
-        userService.edit(editDTO, userEntity);
+        userService.edit(editRequest, userEntity);
         return new ResponseEntity<>(new CommonResponse("회원 정보가 수정되었습니다."), HttpStatus.OK);
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<CommonResponse> userDelete(@Valid @RequestBody DeleteDTO deleteDTO, Authentication auth) {
+    public ResponseEntity<CommonResponse> userDelete(@Valid @RequestBody DeleteRequest deleteRequest, Authentication auth) {
         UserEntity userEntity = userService.getLoginUserByUserId(auth.getName());
-        userService.delete(deleteDTO.getUserPwd(), userEntity);
+        userService.delete(deleteRequest.getUserPwd(), userEntity);
         return new ResponseEntity<>(new CommonResponse("회원 탈퇴되었습니다."), HttpStatus.OK);
     }
 }
