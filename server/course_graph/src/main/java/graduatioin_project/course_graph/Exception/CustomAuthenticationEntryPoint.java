@@ -24,7 +24,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         final String token = jwtProvider.resolveToken(request);
         ErrorCode errorCode;
 
-        if (token.length() < 8 || !token.substring(0, "BEARER ".length()).equalsIgnoreCase("BEARER ")) {
+        if (token == null || token.length() < 8 || !token.substring(0, "BEARER ".length()).equalsIgnoreCase("BEARER ")) {
             errorCode = CustomErrorCode.INVALID_TOKEN;
             JwtAuthenticationFilter.setErrorResponse(response, errorCode);
         }

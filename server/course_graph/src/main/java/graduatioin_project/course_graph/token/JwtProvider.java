@@ -56,7 +56,7 @@ public class JwtProvider {
     }
 
     public boolean validateToken(String jwt) {
-        if (jwt.length() < 8 || !jwt.substring(0, "BEARER ".length()).equalsIgnoreCase("BEARER "))
+        if (jwt == null ||jwt.length() < 8 || !jwt.substring(0, "BEARER ".length()).equalsIgnoreCase("BEARER "))
             return false;
         return !isExpired(jwt);
     }
