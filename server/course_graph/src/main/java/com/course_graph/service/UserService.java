@@ -90,7 +90,8 @@ public class UserService implements UserDetailsService {
     @Transactional
     public void edit(EditRequest editRequest, UserEntity userEntity) {
         String newPassword = editRequest.getNewPassword();
-        if (!newPassword.isEmpty()) {
+        String newPasswordCheck = editRequest.getNewPasswordCheck();
+        if (!newPassword.isEmpty() || !newPasswordCheck.isEmpty()) {
             if (!(newPassword.length() >= 4 && newPassword.length() <= 10))
                 throw new RestApiException(CustomErrorCode.INVALID_PASSWORD_FORMAT);
             checkPasswordMatch(newPassword, editRequest.getNewPasswordCheck());
