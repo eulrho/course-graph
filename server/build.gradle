@@ -47,6 +47,8 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	// JSON
 	implementation 'com.googlecode.json-simple:json-simple:1.1'
+	// javamail
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
 }
 
 tasks.named('test') {

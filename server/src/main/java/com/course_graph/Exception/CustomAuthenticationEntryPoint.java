@@ -1,6 +1,7 @@
 package com.course_graph.Exception;
 
 import com.course_graph.enums.CustomErrorCode;
+import com.course_graph.repository.TokenRepository;
 import com.course_graph.token.JwtAuthenticationFilter;
 import com.course_graph.token.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +19,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
     private final JwtProvider jwtProvider;
+    private final TokenRepository tokenRepository;
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
@@ -28,7 +30,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
             errorCode = CustomErrorCode.INVALID_TOKEN;
             JwtAuthenticationFilter.setErrorResponse(response, errorCode);
         }
-        else if (jwtProvider.isExpired(token)) {
+        else if (jwtProvider.isExpired(token) || !tokenRepository.findByToken(token.split(" ")[1].trim()).isPresent()) {
             errorCode = CustomErrorCode.EXPIRED_TOKEN;
             JwtAuthenticationFilter.setErrorResponse(response, errorCode);
         }

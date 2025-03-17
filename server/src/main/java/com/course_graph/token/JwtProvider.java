@@ -34,7 +34,6 @@ public class JwtProvider {
     }
 
     public static String createToken(String email) {
-        System.out.println(tokenValidTime);
         Claims claims = Jwts.claims().setSubject(email);
         Date now = new Date(System.currentTimeMillis());
 
@@ -66,12 +65,15 @@ public class JwtProvider {
     public boolean isExpired(String jwt) {
         try {
             jwt = jwt.split(" ")[1].trim();
-            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwt);
-            return claims.getBody().getExpiration().before(new Date());
+            return getExpirationDate(jwt).before(new Date());
         }
         catch(Exception e) {
             return true;
         }
+    }
+
+    public static Date getExpirationDate(String token) {
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getExpiration();
     }
 
     public String resolveToken(HttpServletRequest request) {

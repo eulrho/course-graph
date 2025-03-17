@@ -25,8 +25,7 @@ public class UserController {
 
     @PostMapping("/api/login")
     public ResponseEntity<CommonResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
-        UserEntity userEntity = userService.login(loginRequest);
-        String jwtToken = JwtProvider.createToken(userEntity.getEmail());
+        String jwtToken = userService.login(loginRequest);;
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JwtProvider.authorizationHeader, "Bearer " + jwtToken);
@@ -55,7 +54,9 @@ public class UserController {
 
     @PostMapping("/api/logout")
     public ResponseEntity<CommonResponse> userLogout(Authentication auth) {
-        userService.logout();
+        System.out.println("test");
+        UserEntity userEntity = userService.getLoginUserByEmail(auth.getName());
+        userService.logout(userEntity);
         return new ResponseEntity<>(new CommonResponse("로그아웃되었습니다."), HttpStatus.OK);
     }
 }
