@@ -49,6 +49,10 @@ dependencies {
 	implementation 'com.googlecode.json-simple:json-simple:1.1'
 	// javamail
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	// excel file
+	implementation 'org.apache.poi:poi:5.2.3'
+	implementation 'org.apache.poi:poi-ooxml:5.2.3'
+	implementation 'org.apache.xmlbeans:xmlbeans:5.0.2'
 }
 
 tasks.named('test') {

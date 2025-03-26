@@ -25,7 +25,9 @@ public enum CustomErrorCode implements ErrorCode {
     FAILED_TO_SEND_MAIL(HttpStatus.INTERNAL_SERVER_ERROR, "메일 전송에 실패하였습니다."),
     NO_MATCH_CODE(HttpStatus.BAD_REQUEST, "인증 코드가 일치하지 않습니다."),
     EXPIRED_CODE(HttpStatus.UNAUTHORIZED, "인증 코드가 만료되었습니다."),
-    NOT_VERIFIED(HttpStatus.UNAUTHORIZED, "이메일 인증이 필요합니다.");
+    NOT_VERIFIED(HttpStatus.UNAUTHORIZED, "이메일 인증이 필요합니다."),
+    INVALID_FILE(HttpStatus.BAD_REQUEST, "유효하지 않은 파일입니다."),
+    FAIL_TO_UPLOAD_FILE(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패하였습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
