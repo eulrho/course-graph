@@ -48,9 +48,6 @@ public class UserService implements UserDetailsService {
     {
         userRepository.findByEmail(email).ifPresent(m -> {
             throw new RestApiException(CustomErrorCode.DUPLICATE_EMAIL);});
-
-        if (!email.endsWith("@chungbuk.ac.kr") && !email.endsWith("@cbnu.ac.kr"))
-            throw new RestApiException(CustomErrorCode.INVALID_PARAMETER);
     }
 
     public void checkPasswordMatch(String password, String passwordCheck)

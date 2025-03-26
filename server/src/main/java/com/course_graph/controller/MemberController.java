@@ -17,13 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
     private final MemberService memberService;
 
-    @PostMapping("/api/sendMail")
+    @PostMapping("/api/send-mail")
     public ResponseEntity<CommonResponse> sendMessage(@Valid @RequestBody MailRequest mailRequest) {
         memberService.sendMail(mailRequest.getEmail());
         return new ResponseEntity<>(new CommonResponse("이메일이 발송되었습니다."), HttpStatus.OK);
     }
 
-    @PostMapping("/api/verifyMail")
+    @PostMapping("/api/verify-mail")
     public ResponseEntity<CommonResponse> verifyMail(@Valid @RequestBody MemberMailVerifyRequest memberMailVerifyRequest) {
         memberService.verifyCode(memberMailVerifyRequest);
         return new ResponseEntity<>(new CommonResponse("인증되었습니다."), HttpStatus.OK);

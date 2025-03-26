@@ -51,8 +51,15 @@ public class MemberService {
         return mailRepository.save(verificationCodeEntity);
     }
 
+    public void checkEmailFormat(String email)
+    {
+        if (!email.endsWith("@chungbuk.ac.kr") && !email.endsWith("@cbnu.ac.kr"))
+            throw new RestApiException(CustomErrorCode.INVALID_PARAMETER);
+    }
+
     @Transactional
     public void sendMail(String email) {
+        checkEmailFormat(email);
         try {
             VerificationCodeEntity verificationCodeEntity = createVerificationCode(email);
             MimeMessage message = mailService.createMail(email, verificationCodeEntity.getCode());
