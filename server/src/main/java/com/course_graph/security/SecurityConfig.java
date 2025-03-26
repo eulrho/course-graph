@@ -32,8 +32,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(new AntPathRequestMatcher("/api/join")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/api/login")).permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/api/sendMail")).permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/api/verifyMail")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api/send-mail")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api/verify-mail")).permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider, tokenRepository), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling((exceptionHandling) -> exceptionHandling
