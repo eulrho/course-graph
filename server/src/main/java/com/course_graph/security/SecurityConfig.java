@@ -2,7 +2,6 @@ package com.course_graph.security;
 
 import com.course_graph.Exception.CustomAccessDeniedHandler;
 import com.course_graph.Exception.CustomAuthenticationEntryPoint;
-import com.course_graph.repository.TokenRepository;
 import com.course_graph.token.JwtAuthenticationFilter;
 import com.course_graph.token.JwtProvider;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtProvider jwtProvider;
-    private final TokenRepository tokenRepository;
+   // private final TokenRepository tokenRepository;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -35,9 +34,9 @@ public class SecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/api/sendMail")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/api/verifyMail")).permitAll()
                         .anyRequest().authenticated())
-                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider, tokenRepository), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling((exceptionHandling) -> exceptionHandling
-                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint(jwtProvider, tokenRepository))
+                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint(jwtProvider))
                         .accessDeniedHandler(new CustomAccessDeniedHandler())
                 );
 //                .logout((logout) -> logout

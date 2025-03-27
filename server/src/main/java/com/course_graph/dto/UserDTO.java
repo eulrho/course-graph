@@ -1,6 +1,6 @@
 package com.course_graph.dto;
 
-import com.course_graph.entity.UserEntity;
+//import com.course_graph.entity.UserEntity;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -25,12 +25,12 @@ public class UserDTO {
     @NotBlank
     private String passwordCheck;
     private int year;
-
-    public static UserDTO toUserDTO(UserEntity userEntity) {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setEmail(userEntity.getEmail());
-        userDTO.setPassword(userEntity.getPassword());
-        userDTO.setYear(userEntity.getYear());
-        return userDTO;
-    }
+//
+//    public static UserDTO toUserDTO(UserEntity userEntity) {
+//        UserDTO userDTO = new UserDTO();
+//        userDTO.setEmail(userEntity.getEmail());
+//        userDTO.setPassword(userEntity.getPassword());
+//        userDTO.setYear(userEntity.getYear());
+//        return userDTO;
+//    }
 }
