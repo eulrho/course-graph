@@ -19,7 +19,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class FileService {
-    public void upload(MultipartFile file) {
+    public void historyFileUpload(MultipartFile file) {
         try {
             if (!isValidFile(file)) throw new Exception("");
 

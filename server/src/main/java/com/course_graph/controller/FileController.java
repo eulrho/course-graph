@@ -16,9 +16,9 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileController {
     private final FileService fileService;
 
-    @PostMapping("/api/file-upload")
-    public ResponseEntity<CommonResponse> join(@RequestBody MultipartFile file, Authentication auth) {
-        fileService.upload(file);
+    @PostMapping("/api/history-upload")
+    public ResponseEntity<CommonResponse> historyFileUpload(@RequestBody MultipartFile file, Authentication auth) {
+        fileService.historyFileUpload(file);
         return new ResponseEntity<>(new CommonResponse("파일이 업로드되었습니다."), HttpStatus.CREATED);
     }
 }
