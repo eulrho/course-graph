@@ -23,9 +23,9 @@ public class FileController {
     }
 
     // initialize subject
-    @PostMapping("/api/subject-upload")
-    public ResponseEntity<CommonResponse> subjectFileUpload(@RequestBody MultipartFile file, int year) {
-        fileService.subjectFileUpload(file, year);
-        return new ResponseEntity<>(new CommonResponse("파일이 업로드되었습니다."), HttpStatus.CREATED);
-    }
+//    @PostMapping("/api/subject-upload")
+//    public ResponseEntity<CommonResponse> subjectFileUpload(@RequestBody MultipartFile file, int year) {
+//        fileService.subjectFileUpload(file, year);
+//        return new ResponseEntity<>(new CommonResponse("파일이 업로드되었습니다."), HttpStatus.CREATED);
+//    }
 }
