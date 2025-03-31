@@ -1,5 +1,5 @@
 package com.course_graph.enums;
 
-public enum SubjectTrack {
+public enum Track {
     Embedded_AI, AIoT, Intelligent_System;
 }

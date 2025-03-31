@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Table(name = "user")
@@ -22,6 +25,10 @@ public class UserEntity {
     @Column(nullable = false, length = 500)
     private String password;
 
+    // user-subject join table
+    @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL)
+    private List<HistoryEntity> historyEntityList = new ArrayList<>();
+
     @Builder
     public static UserEntity toUserEntity(UserDTO userDTO) {
         UserEntity userEntity = new UserEntity();
@@ -34,5 +41,9 @@ public class UserEntity {
     public void edit(String newPassword, int newYear) {
         this.password = newPassword;
         this.year = newYear;
+    }
+
+    public void addHistory(HistoryEntity historyEntity) {
+        this.historyEntityList.add(historyEntity);
     }
 }
