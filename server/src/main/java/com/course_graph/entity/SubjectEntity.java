@@ -23,9 +23,6 @@ public class SubjectEntity {
     private int credit;
 
     @Column(nullable = false, length = 100)
-    private String semester;
-
-    @Column(nullable = false, length = 100)
     private String grade;
 
     @Column(nullable = false, length = 200)
@@ -43,7 +40,6 @@ public class SubjectEntity {
         subjectEntity.code = subjectDTO.getCode();
         subjectEntity.name = subjectDTO.getName();
         subjectEntity.credit = subjectDTO.getCredit();
-        subjectEntity.semester = subjectDTO.getSemester();
         subjectEntity.grade = subjectDTO.getGrade();
         subjectEntity.type = subjectDTO.getType();
         subjectEntity.createdAt = subjectDTO.getCreatedAt();

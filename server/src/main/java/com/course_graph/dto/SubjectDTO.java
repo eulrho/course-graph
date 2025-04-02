@@ -14,7 +14,6 @@ public class SubjectDTO {
     private String code;
     private String name;
     private int credit;
-    private String semester;
     private String grade;
     private String type;
     private int createdAt;

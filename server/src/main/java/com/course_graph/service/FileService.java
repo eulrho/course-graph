@@ -173,9 +173,6 @@ public class FileService {
                     case "학점":
                         subjectDTO.setCredit(parseInt(value));
                         break;
-                    case "학기":
-                        subjectDTO.setSemester(value);
-                        break;
                     case "학년":
                         subjectDTO.setGrade(value);
                         break;
@@ -225,4 +222,6 @@ public class FileService {
         }
         return null;
     }
+
+
 }
