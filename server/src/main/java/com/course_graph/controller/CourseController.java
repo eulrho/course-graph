@@ -1,9 +1,6 @@
 package com.course_graph.controller;
 
-import com.course_graph.dto.HistoryDTO;
-import com.course_graph.dto.CourseStatusDTO;
-import com.course_graph.dto.HistoryPageResponse;
-import com.course_graph.dto.PageInfoDTO;
+import com.course_graph.dto.*;
 import com.course_graph.service.CourseService;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -11,10 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -36,9 +30,9 @@ public class CourseController {
         return new ResponseEntity<>(courseStatusDTOList, HttpStatus.OK);
     }
 
-//    @PatchMapping("/api/history")
-//    public ResponseEntity<Void> updateHistory(Authentication auth) {
-//        courseService.updateHistory(auth.getName());
-//        return new ResponseEntity<>(HttpStatus.OK);
-//    }
+    @PatchMapping("/api/history")
+    public ResponseEntity<CommonResponse> updateHistory(@RequestBody List<ScoreUpdateRequest> updateRequests, Authentication auth) {
+        courseService.updateHistory(updateRequests, auth.getName());
+        return new ResponseEntity<>(new CommonResponse("수정 사항이 반영되었습니다."),HttpStatus.OK);
+    }
 }

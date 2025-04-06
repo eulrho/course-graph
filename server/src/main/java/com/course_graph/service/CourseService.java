@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +72,21 @@ public class CourseService {
 
     public Page<HistoryEntity> findHistories(UserEntity userEntity, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page-1, size);
-
         return historyRepository.findAllByUserEntityOrderByIdAsc(userEntity, pageRequest);
+    }
+
+    @Transactional
+    public void updateHistory(List<ScoreUpdateRequest> updateRequests, String email) {
+        UserEntity userEntity = userService.getLoginUserByEmail(email);
+        for (ScoreUpdateRequest updateRequest : updateRequests) {
+            List<SubjectEntity> subjectEntityList = subjectRepository.findAllByName(updateRequest.getSubjectName());
+            for (SubjectEntity subjectEntity : subjectEntityList) {
+                Optional<HistoryEntity> optionalHistoryEntity = historyRepository.findByUserEntityAndSubjectEntity(userEntity, subjectEntity);
+                if (optionalHistoryEntity.isEmpty()) continue ;
+                HistoryEntity historyEntity = optionalHistoryEntity.get();
+                historyEntity.edit(updateRequest.getScore());
+                break ;
+            }
+        }
     }
 }
