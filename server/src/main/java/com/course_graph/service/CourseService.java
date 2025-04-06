@@ -57,10 +57,10 @@ public class CourseService {
         return courseStatusDTOList;
     }
 
-    public List<CourseStatusDTO> getUserCourseAll(String email) {
+    public List<CourseStatusDTO> getUserCourseAll(String grade, String email) {
         UserEntity userEntity = userService.getLoginUserByEmail(email);
         List<CourseStatusDTO> courseStatusDTOList = new ArrayList<>();
-        List<SubjectEntity> subjectEntityList = subjectRepository.findAll();
+        List<SubjectEntity> subjectEntityList = subjectRepository.findAllByGrade(grade);
 
         for (SubjectEntity subjectEntity : subjectEntityList) {
             SubjectDTO subjectDTO = SubjectDTO.toSubjectDTO(subjectEntity);

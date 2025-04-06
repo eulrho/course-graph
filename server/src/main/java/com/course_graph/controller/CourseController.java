@@ -31,8 +31,8 @@ public class CourseController {
     }
 
     @GetMapping("/api/subjects")
-    public ResponseEntity<List<CourseStatusDTO>> courseAll(Authentication auth) {
-        List<CourseStatusDTO> courseStatusDTOList = courseService.getUserCourseAll(auth.getName());
+    public ResponseEntity<List<CourseStatusDTO>> getAllSubject(@RequestParam String grade, Authentication auth) {
+        List<CourseStatusDTO> courseStatusDTOList = courseService.getUserCourseAll(grade, auth.getName());
         return new ResponseEntity<>(courseStatusDTOList, HttpStatus.OK);
     }
 
