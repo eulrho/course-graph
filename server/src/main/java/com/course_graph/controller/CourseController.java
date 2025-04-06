@@ -30,6 +30,12 @@ public class CourseController {
         return new ResponseEntity<>(courseStatusDTOList, HttpStatus.OK);
     }
 
+    @GetMapping("/api/subjects")
+    public ResponseEntity<List<CourseStatusDTO>> courseAll(Authentication auth) {
+        List<CourseStatusDTO> courseStatusDTOList = courseService.getUserCourseAll(auth.getName());
+        return new ResponseEntity<>(courseStatusDTOList, HttpStatus.OK);
+    }
+
     @PatchMapping("/api/history")
     public ResponseEntity<CommonResponse> updateHistory(@RequestBody List<ScoreUpdateRequest> updateRequests, Authentication auth) {
         courseService.updateHistory(updateRequests, auth.getName());

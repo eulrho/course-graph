@@ -204,7 +204,7 @@ public class FileService {
                 }
             }
 
-            Optional<SubjectEntity> optionalSubject = subjectRepository.findByCodeAndDeletedAt(code, year);
+            Optional<SubjectEntity> optionalSubject = subjectRepository.findByCodeAndName(code, name);
             if (optionalSubject.isPresent()) {
                 SubjectEntity subjectEntity = optionalSubject.get();
                 subjectEntity.extendDeletedAt(year + 1);
@@ -243,12 +243,10 @@ public class FileService {
                 }
             }
 
-            List<SubjectEntity> subjectEntityList = subjectRepository.findAllByCodeAndName(subjectCode, name);
-            if (subjectEntityList.isEmpty() || track == null) throw new RestApiException(CustomErrorCode.INVALID_FILE);
-            for (SubjectEntity subjectEntity : subjectEntityList) {
-                CurriculumEntity curriculumEntity = CurriculumEntity.toCurriculumEntity(subjectEntity, track);
-                curriculumRepository.save(curriculumEntity);
-            }
+            Optional<SubjectEntity> optionalSubject = subjectRepository.findByCodeAndName(subjectCode, name);
+            if (optionalSubject.isEmpty() || track == null) throw new RestApiException(CustomErrorCode.INVALID_FILE);
+            CurriculumEntity curriculumEntity = CurriculumEntity.toCurriculumEntity(optionalSubject.get(), track);
+            curriculumRepository.save(curriculumEntity);
         }
     }
 

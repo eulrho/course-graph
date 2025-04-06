@@ -17,8 +17,8 @@ public class CourseDTO {
     public static CourseDTO toCourseDTO(String subjectName, List<String> tracks, String grade) {
         CourseDTO courseDTO = new CourseDTO();
         courseDTO.setSubjectName(subjectName);
-        courseDTO.setGrade(grade);
         courseDTO.setTracks(tracks);
+        courseDTO.setGrade(grade);
         return courseDTO;
     }
 }

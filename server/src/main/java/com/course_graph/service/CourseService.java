@@ -38,7 +38,7 @@ public class CourseService {
         List<SubjectEntity> subjectEntityList = subjectRepository.findAllByDeletedAtGreaterThan(currentYear);
         for (SubjectEntity subjectEntity : subjectEntityList) {
             CourseDTO courseDTO = CourseDTO.toCourseDTO(subjectEntity.getName(), extractSubjectTracks(subjectEntity), subjectEntity.getGrade());
-            CourseStatusDTO courseStatusDTO = CourseStatusDTO.toCourseStatusDTO(courseDTO);
+            CourseStatusDTO courseStatusDTO = new CourseStatusDTO(courseDTO, SubjectStatus.NOT_TAKEN.toString());
             if (isTakenSubject(subjectEntity, userEntity))
                 courseStatusDTO.setStatus(SubjectStatus.TAKEN.toString());
             courseStatusDTOList.add(courseStatusDTO);
@@ -49,10 +49,25 @@ public class CourseService {
             SubjectEntity takenSubjectEntity = data.getSubjectEntity();
             if (takenSubjectEntity.getDeletedAt() <= currentYear) {
                 CourseDTO courseDTO = CourseDTO.toCourseDTO(takenSubjectEntity.getName(), extractSubjectTracks(takenSubjectEntity), takenSubjectEntity.getGrade());
-                CourseStatusDTO courseStatusDTO = CourseStatusDTO.toCourseStatusDTO(courseDTO);
+                CourseStatusDTO courseStatusDTO = new CourseStatusDTO(courseDTO, SubjectStatus.NOT_TAKEN.toString());
                 courseStatusDTO.setStatus(SubjectStatus.TAKEN.toString());
                 courseStatusDTOList.add(courseStatusDTO);
             }
+        }
+        return courseStatusDTOList;
+    }
+
+    public List<CourseStatusDTO> getUserCourseAll(String email) {
+        UserEntity userEntity = userService.getLoginUserByEmail(email);
+        List<CourseStatusDTO> courseStatusDTOList = new ArrayList<>();
+        List<SubjectEntity> subjectEntityList = subjectRepository.findAll();
+
+        for (SubjectEntity subjectEntity : subjectEntityList) {
+            SubjectDTO subjectDTO = SubjectDTO.toSubjectDTO(subjectEntity);
+            CourseStatusDTO courseStatusDTO = new CourseStatusDTO(subjectDTO, SubjectStatus.NOT_TAKEN.toString());
+            if (isTakenSubject(subjectEntity, userEntity))
+                courseStatusDTO.setStatus(SubjectStatus.TAKEN.toString());
+            courseStatusDTOList.add(courseStatusDTO);
         }
         return courseStatusDTOList;
     }
@@ -79,14 +94,10 @@ public class CourseService {
     public void updateHistory(List<ScoreUpdateRequest> updateRequests, String email) {
         UserEntity userEntity = userService.getLoginUserByEmail(email);
         for (ScoreUpdateRequest updateRequest : updateRequests) {
-            List<SubjectEntity> subjectEntityList = subjectRepository.findAllByName(updateRequest.getSubjectName());
-            for (SubjectEntity subjectEntity : subjectEntityList) {
-                Optional<HistoryEntity> optionalHistoryEntity = historyRepository.findByUserEntityAndSubjectEntity(userEntity, subjectEntity);
-                if (optionalHistoryEntity.isEmpty()) continue ;
-                HistoryEntity historyEntity = optionalHistoryEntity.get();
-                historyEntity.edit(updateRequest.getScore());
-                break ;
-            }
+            Optional<SubjectEntity> optionalSubject = subjectRepository.findByName(updateRequest.getSubjectName());
+            Optional<HistoryEntity> optionalHistory = historyRepository.findByUserEntityAndSubjectEntity(userEntity, optionalSubject.get());
+            HistoryEntity historyEntity = optionalHistory.get();
+            historyEntity.edit(updateRequest.getScore());
         }
     }
 }
