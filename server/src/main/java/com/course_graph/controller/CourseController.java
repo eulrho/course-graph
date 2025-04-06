@@ -17,8 +17,8 @@ import java.util.List;
 public class CourseController {
     private final CourseService courseService;
 
-    @GetMapping("/api/history-search")
-    public ResponseEntity<List<HistoryDTO>> searchHistory(Authentication auth) {
+    @GetMapping("/api/history")
+    public ResponseEntity<List<HistoryDTO>> history(Authentication auth) {
         List<HistoryDTO> historyDTOList = courseService.getUserHistory(auth.getName());
         return new ResponseEntity<>(historyDTOList, HttpStatus.OK);
     }
