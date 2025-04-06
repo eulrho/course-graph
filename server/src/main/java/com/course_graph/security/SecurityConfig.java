@@ -35,6 +35,7 @@ public class SecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/api/send-mail")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/api/verify-mail")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/api/subject-upload")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api/curriculum-upload")).permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider, tokenRepository), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling((exceptionHandling) -> exceptionHandling

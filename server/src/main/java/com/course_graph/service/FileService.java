@@ -1,12 +1,14 @@
 package com.course_graph.service;
 
 import com.course_graph.Exception.RestApiException;
-import com.course_graph.dto.SubjectDTO;
+import com.course_graph.entity.CurriculumEntity;
 import com.course_graph.entity.HistoryEntity;
 import com.course_graph.entity.SubjectEntity;
 import com.course_graph.entity.UserEntity;
 import com.course_graph.enums.CustomErrorCode;
+import com.course_graph.enums.Track;
 import com.course_graph.enums.Type;
+import com.course_graph.repository.CurriculumRepository;
 import com.course_graph.repository.HistoryRepository;
 import com.course_graph.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +33,7 @@ public class FileService {
     private final SubjectRepository subjectRepository;
     private final UserService userService;
     private final HistoryRepository historyRepository;
+    private final CurriculumRepository curriculumRepository;
 
     @Transactional
     public void historyFileUpload(MultipartFile file, String email) {
@@ -52,6 +56,22 @@ public class FileService {
             List<List<String>> resultData = readFile(file, "순번", "");
             if (resultData.isEmpty()) throw new Exception("");
             saveSubjectFile(year, resultData);
+        } catch (IOException e) {
+            throw new RestApiException(CustomErrorCode.FAIL_TO_UPLOAD_FILE);
+        } catch (Exception e) {
+            throw new RestApiException(CustomErrorCode.INVALID_FILE);
+        }
+    }
+
+    @Transactional
+    public void curriculumFileUpload(MultipartFile file) {
+        try {
+            List<List<String>> resultData = readFile(file, "트랙명", "");
+            if (resultData.isEmpty()) throw new Exception("");
+            for (List<String> data : resultData) {
+                System.out.println(data);
+            }
+            saveCurriculumFile(resultData);
         } catch (IOException e) {
             throw new RestApiException(CustomErrorCode.FAIL_TO_UPLOAD_FILE);
         } catch (Exception e) {
@@ -134,19 +154,18 @@ public class FileService {
             for (int j = 0; j < columns.size(); j++) {
                 String column = columns.get(j);
                 String value = row.get(j);
-                System.out.println(column);
                 if (column.equals("구분") && !value.equals("전공")) break ;
                 else if (column.equals("년도")) year = parseInt(value);
                 else if (column.equals("교과목번호")) subjectCode = value;
                 else if (column.equals("성적")) score = value;
             }
 
-            List<SubjectEntity> subjectEntityList = subjectRepository.findByCode(subjectCode);
-            if (subjectEntityList.isEmpty() || year == -1 || score.isEmpty()) continue ;
+            if (subjectCode.isEmpty() || year == -1 || score.isEmpty()) continue ;
 
-            SubjectEntity subjectEntity = findTakenSubjectEntity(year, subjectEntityList);
-            if (subjectEntity == null) throw new RestApiException(CustomErrorCode.INVALID_FILE);
-            HistoryEntity historyEntity = HistoryEntity.toHistoryEntity(userEntity, subjectEntity, score);
+            Optional<SubjectEntity> optionalSubject = subjectRepository.findByCodeAndDeletedAtGreaterThan(subjectCode, year);
+            if (optionalSubject.isEmpty()) continue ;
+
+            HistoryEntity historyEntity = HistoryEntity.toHistoryEntity(userEntity, optionalSubject.get(), score);
             userEntity.addHistory(historyEntity);
             historyRepository.save(historyEntity);
         }
@@ -156,41 +175,80 @@ public class FileService {
     public void saveSubjectFile(int year, List<List<String>> fileData) {
         List<String> columns = fileData.get(0);
 
+        String code = "", name = "", grade = "";
+        int credit = -1;
+        Type type = null;
         for (int i = 1; i < fileData.size(); i++) {
             List<String> row = fileData.get(i);
-            SubjectDTO subjectDTO = new SubjectDTO();
 
             for (int j = 0; j < columns.size(); j++) {
                 String column = columns.get(j);
                 String value = row.get(j);
                 switch (column) {
                     case "과목코드":
-                        subjectDTO.setCode(value);
+                        code = value;
                         break;
                     case "과목명":
-                        subjectDTO.setName(value);
+                        name = value;
                         break;
                     case "학점":
-                        subjectDTO.setCredit(parseInt(value));
+                        credit = parseInt(value);
                         break;
                     case "학년":
-                        subjectDTO.setGrade(value);
+                        grade = value;
                         break;
                     case "이수구분":
-                        if (value.equals("전공선택")) subjectDTO.setType(Type.MAJOR_ELECTIVE);
-                        else if (value.equals("전공필수")) subjectDTO.setType(Type.MAJOR_REQUIRED);
+                        if (value.equals("전공선택")) type = Type.MAJOR_ELECTIVE;
+                        else if (value.equals("전공필수")) type = Type.MAJOR_REQUIRED;
                         break;
                 }
             }
 
-            List<SubjectEntity> subjectEntityList = subjectRepository.findByCode(subjectDTO.getCode());
-            SubjectEntity subjectEntity = findSubjectEntity(year, subjectEntityList);
-            if (subjectEntity == null) {
-                subjectDTO.setCreatedAt(year);
-                subjectDTO.setDeletedAt(year + 1);
-                subjectRepository.save(SubjectEntity.toSubjectEntity(subjectDTO));
+            Optional<SubjectEntity> optionalSubject = subjectRepository.findByCodeAndDeletedAt(code, year);
+            if (optionalSubject.isPresent()) {
+                SubjectEntity subjectEntity = optionalSubject.get();
+                subjectEntity.extendDeletedAt(year + 1);
             }
-            else subjectEntity.extendDeletedAt(year + 1);
+            else {
+                if (code.isEmpty() || name.isEmpty() || credit == -1 || grade.isEmpty() || type == null) continue ;
+                SubjectEntity subjectEntity = SubjectEntity.toSubjectEntity(code, name, credit, grade, type.toString(), year, year + 1);
+                subjectRepository.save(subjectEntity);
+            }
+        }
+    }
+
+    @Transactional
+    public void saveCurriculumFile(List<List<String>> fileData) {
+        List<String> columns = fileData.get(0);
+
+        for (int i = 1; i < fileData.size(); i++) {
+            List<String> row = fileData.get(i);
+            String subjectCode = "", name = "";
+            Track track = null;
+            for (int j = 0; j < columns.size(); j++) {
+                String column = columns.get(j);
+                String value = row.get(j);
+                switch (column) {
+                    case "트랙명":
+                        if (value.equals("지능형시스템")) track = Track.INTELLIGENT_SYS;
+                        else if (value.equals("자율주행차 V2X 통신시스템")) track = Track.AUTO_V2X_COMM;
+                        else throw new RestApiException(CustomErrorCode.INVALID_FILE);
+                        break;
+                    case "교과목번호":
+                        subjectCode = value;
+                        break;
+                    case "교과목명":
+                        name = value;
+                        break;
+                }
+            }
+
+            List<SubjectEntity> subjectEntityList = subjectRepository.findAllByCodeAndName(subjectCode, name);
+            if (subjectEntityList.isEmpty() || track == null) throw new RestApiException(CustomErrorCode.INVALID_FILE);
+            for (SubjectEntity subjectEntity : subjectEntityList) {
+                CurriculumEntity curriculumEntity = CurriculumEntity.toCurriculumEntity(subjectEntity, track);
+                curriculumRepository.save(curriculumEntity);
+            }
         }
     }
 
@@ -202,26 +260,4 @@ public class FileService {
             throw new RestApiException(CustomErrorCode.INVALID_FILE);
         }
     }
-
-    public SubjectEntity findSubjectEntity(int year, List<SubjectEntity> subjectEntityList) {
-        for (int j = 0; j < subjectEntityList.size(); j++) {
-            SubjectEntity subjectEntity = subjectEntityList.get(j);
-            if (subjectEntity.getDeletedAt() == year) {
-                return subjectEntity;
-            }
-        }
-        return null;
-    }
-
-    public SubjectEntity findTakenSubjectEntity(int year, List<SubjectEntity> subjectEntityList) {
-        for (int j = 0; j < subjectEntityList.size(); j++) {
-            SubjectEntity subjectEntity = subjectEntityList.get(j);
-            if (subjectEntity.getDeletedAt() > year) {
-                return subjectEntity;
-            }
-        }
-        return null;
-    }
-
-
 }

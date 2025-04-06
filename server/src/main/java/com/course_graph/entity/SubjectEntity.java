@@ -1,9 +1,12 @@
 package com.course_graph.entity;
 
-import com.course_graph.dto.SubjectDTO;
+import com.course_graph.dto.ScheduleDTO;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -34,16 +37,23 @@ public class SubjectEntity {
     @Column(nullable = false)
     private int deletedAt;
 
+    // subject-subject join table
+    @OneToMany(mappedBy = "subjectEntity", cascade = CascadeType.ALL)
+    private List<HistoryEntity> historyEntityList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "subjectEntity", cascade = CascadeType.ALL)
+    private List<CurriculumEntity> curriculumEntityList = new ArrayList<>();
+
     @Builder
-    public static SubjectEntity toSubjectEntity(SubjectDTO subjectDTO) {
+    public static SubjectEntity toSubjectEntity(String code, String name, int credit, String grade, String type, int createdAt, int deletedAt) {
         SubjectEntity subjectEntity = new SubjectEntity();
-        subjectEntity.code = subjectDTO.getCode();
-        subjectEntity.name = subjectDTO.getName();
-        subjectEntity.credit = subjectDTO.getCredit();
-        subjectEntity.grade = subjectDTO.getGrade();
-        subjectEntity.type = subjectDTO.getType();
-        subjectEntity.createdAt = subjectDTO.getCreatedAt();
-        subjectEntity.deletedAt = subjectDTO.getDeletedAt();
+        subjectEntity.code = code;
+        subjectEntity.name = name;
+        subjectEntity.credit = credit;
+        subjectEntity.grade = grade;
+        subjectEntity.type = type;
+        subjectEntity.createdAt = createdAt;
+        subjectEntity.deletedAt = deletedAt;
         return subjectEntity;
     }
 

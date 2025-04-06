@@ -28,4 +28,11 @@ public class FileController {
         fileService.subjectFileUpload(file, year);
         return new ResponseEntity<>(new CommonResponse("파일이 업로드되었습니다."), HttpStatus.CREATED);
     }
+
+    // initialize curriculum
+    @PostMapping("/api/curriculum-upload")
+    public ResponseEntity<CommonResponse> curriculumFileUpload(@RequestBody MultipartFile file) {
+        fileService.curriculumFileUpload(file);
+        return new ResponseEntity<>(new CommonResponse("파일이 업로드되었습니다."), HttpStatus.CREATED);
+    }
 }

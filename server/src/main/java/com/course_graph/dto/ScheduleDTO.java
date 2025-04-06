@@ -10,14 +10,12 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @ToString
-public class SubjectDTO {
+public class ScheduleDTO {
     private String code;
     private String name;
     private int credit;
     private String grade;
     private String type;
-    private int createdAt;
-    private int deletedAt;
 
     public void setType(Type type) {
         this.type = type.toString();
