@@ -1,10 +1,12 @@
 package com.course_graph.service;
 
+import com.course_graph.Exception.RestApiException;
 import com.course_graph.dto.*;
 import com.course_graph.entity.CurriculumEntity;
 import com.course_graph.entity.HistoryEntity;
 import com.course_graph.entity.SubjectEntity;
 import com.course_graph.entity.UserEntity;
+import com.course_graph.enums.CustomErrorCode;
 import com.course_graph.enums.SubjectStatus;
 import com.course_graph.repository.HistoryRepository;
 import com.course_graph.repository.SubjectRepository;
@@ -57,7 +59,7 @@ public class CourseService {
         return courseStatusDTOList;
     }
 
-    public List<CourseStatusDTO> getUserCourseAll(String grade, String email) {
+    public List<CourseStatusDTO> getUserAllSubjects(String grade, String email) {
         UserEntity userEntity = userService.getLoginUserByEmail(email);
         List<CourseStatusDTO> courseStatusDTOList = new ArrayList<>();
         List<SubjectEntity> subjectEntityList = subjectRepository.findAllByGrade(grade);
@@ -91,13 +93,30 @@ public class CourseService {
     }
 
     @Transactional
-    public void updateHistory(List<ScoreUpdateRequest> updateRequests, String email) {
+    public void updateUserScores(List<ScoreUpdateRequest> updateRequests, String email) {
         UserEntity userEntity = userService.getLoginUserByEmail(email);
         for (ScoreUpdateRequest updateRequest : updateRequests) {
             Optional<SubjectEntity> optionalSubject = subjectRepository.findByName(updateRequest.getSubjectName());
             Optional<HistoryEntity> optionalHistory = historyRepository.findByUserEntityAndSubjectEntity(userEntity, optionalSubject.get());
             HistoryEntity historyEntity = optionalHistory.get();
             historyEntity.edit(updateRequest.getScore());
+        }
+    }
+
+    @Transactional
+    public void updateUserTakenSubjectList(List<StatusUpdateRequest> updateRequests, String email) {
+        UserEntity userEntity = userService.getLoginUserByEmail(email);
+        for (StatusUpdateRequest updateRequest : updateRequests) {
+            Optional<SubjectEntity> optionalSubject = subjectRepository.findByName(updateRequest.getSubjectName());
+            Optional<HistoryEntity> optionalHistory = historyRepository.findByUserEntityAndSubjectEntity(userEntity, optionalSubject.get());
+            if (updateRequest.getStatus().equals(SubjectStatus.TAKEN.toString())) {
+                if (optionalHistory.isPresent()) continue ;
+                HistoryEntity historyEntity = HistoryEntity.toHistoryEntity(userEntity, optionalSubject.get(), "");
+                historyRepository.save(historyEntity);
+            }
+            else if (updateRequest.getStatus().equals(SubjectStatus.NOT_TAKEN.toString()))
+                optionalHistory.ifPresent(historyRepository::delete);
+            else throw new RestApiException(CustomErrorCode.INVALID_PARAMETER);
         }
     }
 }

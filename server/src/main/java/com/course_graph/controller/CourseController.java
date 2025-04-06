@@ -31,14 +31,20 @@ public class CourseController {
     }
 
     @GetMapping("/api/subjects")
-    public ResponseEntity<List<CourseStatusDTO>> getAllSubject(@RequestParam String grade, Authentication auth) {
-        List<CourseStatusDTO> courseStatusDTOList = courseService.getUserCourseAll(grade, auth.getName());
+    public ResponseEntity<List<CourseStatusDTO>> getAllSubjects(@RequestParam String grade, Authentication auth) {
+        List<CourseStatusDTO> courseStatusDTOList = courseService.getUserAllSubjects(grade, auth.getName());
         return new ResponseEntity<>(courseStatusDTOList, HttpStatus.OK);
     }
 
+    @PatchMapping("/api/subjects")
+    public ResponseEntity<CommonResponse> updateTakenSubjectList(@RequestBody List<StatusUpdateRequest> updateRequests, Authentication auth) {
+        courseService.updateUserTakenSubjectList(updateRequests, auth.getName());
+        return new ResponseEntity<>(new CommonResponse("수정 사항이 반영되었습니다."), HttpStatus.OK);
+    }
+
     @PatchMapping("/api/history")
-    public ResponseEntity<CommonResponse> updateHistory(@RequestBody List<ScoreUpdateRequest> updateRequests, Authentication auth) {
-        courseService.updateHistory(updateRequests, auth.getName());
+    public ResponseEntity<CommonResponse> updateScores(@RequestBody List<ScoreUpdateRequest> updateRequests, Authentication auth) {
+        courseService.updateUserScores(updateRequests, auth.getName());
         return new ResponseEntity<>(new CommonResponse("수정 사항이 반영되었습니다."),HttpStatus.OK);
     }
 }
