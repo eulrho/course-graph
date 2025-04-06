@@ -1,8 +1,6 @@
 package com.course_graph.service;
 
-import com.course_graph.dto.CourseDTO;
-import com.course_graph.dto.HistoryDTO;
-import com.course_graph.dto.CourseStatusDTO;
+import com.course_graph.dto.*;
 import com.course_graph.entity.CurriculumEntity;
 import com.course_graph.entity.HistoryEntity;
 import com.course_graph.entity.SubjectEntity;
@@ -11,6 +9,8 @@ import com.course_graph.enums.SubjectStatus;
 import com.course_graph.repository.HistoryRepository;
 import com.course_graph.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,16 +25,10 @@ public class CourseService {
     private final HistoryRepository historyRepository;
     private final int currentYear = 2025;
 
-    public List<HistoryDTO> getUserHistory(String email) {
+    public Page<HistoryDTO> getUserHistory(String email, int page) {
         UserEntity userEntity = userService.getLoginUserByEmail(email);
-        List<HistoryEntity> historyEntityList = userEntity.getHistoryEntityList();
-
-        List<HistoryDTO> historyDTOList = new ArrayList<>();
-        for (HistoryEntity data : historyEntityList) {
-            HistoryDTO historyDTO = HistoryDTO.toHistoryDTO(data);
-            historyDTOList.add(historyDTO);
-        }
-        return historyDTOList;
+        return findHistories(userEntity, page, 12)
+                .map(HistoryDTO::toHistoryDTO);
     }
 
     public List<CourseStatusDTO> getUserCourse(String email) {
@@ -73,5 +67,11 @@ public class CourseService {
     public boolean isTakenSubject(SubjectEntity subjectEntity, UserEntity userEntity) {
         Optional<HistoryEntity> optionalHistoryEntity = historyRepository.findByUserEntityAndSubjectEntity(userEntity, subjectEntity);
         return optionalHistoryEntity.isPresent();
+    }
+
+    public Page<HistoryEntity> findHistories(UserEntity userEntity, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page-1, size);
+
+        return historyRepository.findAllByUserEntityOrderByIdAsc(userEntity, pageRequest);
     }
 }
