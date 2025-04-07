@@ -2,14 +2,11 @@ package com.course_graph.service;
 
 import com.course_graph.Exception.RestApiException;
 import com.course_graph.dto.*;
-import com.course_graph.entity.CurriculumEntity;
-import com.course_graph.entity.HistoryEntity;
-import com.course_graph.entity.SubjectEntity;
-import com.course_graph.entity.UserEntity;
+import com.course_graph.entity.*;
 import com.course_graph.enums.CustomErrorCode;
 import com.course_graph.enums.SubjectStatus;
-import com.course_graph.repository.HistoryRepository;
-import com.course_graph.repository.SubjectRepository;
+import com.course_graph.enums.Type;
+import com.course_graph.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +23,9 @@ public class CourseService {
     private final UserService userService;
     private final SubjectRepository subjectRepository;
     private final HistoryRepository historyRepository;
+    private final GraduationRepository graduationRepository;
+    private final SubjectTypeRepository subjectTypeRepository;
+    private final SubjectEquivalenceRepository subjectEquivalenceRepository;
     private final int currentYear = 2025;
 
     public Page<HistoryDTO> getUserHistory(String email, int page) {
@@ -50,7 +50,8 @@ public class CourseService {
         for (HistoryEntity data : historyEntityList) {
             SubjectEntity takenSubjectEntity = data.getSubjectEntity();
             if (takenSubjectEntity.getDeletedAt() <= currentYear) {
-                CourseDTO courseDTO = CourseDTO.toCourseDTO(takenSubjectEntity.getName(), extractSubjectTracks(takenSubjectEntity), takenSubjectEntity.getGrade());
+                CourseDTO courseDTO = CourseDTO.toCourseDTO(takenSubjectEntity.getName(),
+                        extractSubjectTracks(takenSubjectEntity), takenSubjectEntity.getGrade());
                 CourseStatusDTO courseStatusDTO = new CourseStatusDTO(courseDTO, SubjectStatus.NOT_TAKEN.toString());
                 courseStatusDTO.setStatus(SubjectStatus.TAKEN.toString());
                 courseStatusDTOList.add(courseStatusDTO);
@@ -74,6 +75,46 @@ public class CourseService {
         return courseStatusDTOList;
     }
 
+    public GraduationResponse getUserGraduationInfo(String email) {
+        UserEntity userEntity = userService.getLoginUserByEmail(email);
+        Optional<GraduationEntity> optionalGraduation = graduationRepository.findByYear(userEntity.getYear());
+
+        int totalRequiredCredit = 0, totalElectiveCredit = 0;
+        List<String> notTakenRequiredSubjects = new ArrayList<>();
+        List<SubjectEntity> subjectEntityList = subjectRepository.findAllByDeletedAtGreaterThan(currentYear);
+        for (SubjectEntity subjectEntity : subjectEntityList) {
+            Optional<SubjectTypeEntity> optionalSubjectType = subjectTypeRepository
+                    .findBySubjectEntityAndEndedAtGreaterThan(subjectEntity, userEntity.getYear());
+            SubjectTypeEntity subjectTypeEntity = optionalSubjectType.get();
+
+            if (isTakenSubject(subjectEntity, userEntity)) {
+                if (subjectTypeEntity.getType().equals(Type.MAJOR_REQUIRED.toString()))
+                    totalRequiredCredit += subjectEntity.getCredit();
+                else totalElectiveCredit += subjectEntity.getCredit();
+            } else {
+                if (subjectTypeEntity.getType().equals(Type.MAJOR_REQUIRED.toString())
+                        && !isTakenSubject(getOriginalSubject(subjectEntity), userEntity))
+                    notTakenRequiredSubjects.add(subjectEntity.getName());
+            }
+        }
+
+        List<HistoryEntity> historyEntityList = userEntity.getHistoryEntityList();
+        for (HistoryEntity data : historyEntityList) {
+            SubjectEntity takenSubjectEntity = data.getSubjectEntity();
+            Optional<SubjectTypeEntity> optionalSubjectType = subjectTypeRepository
+                    .findBySubjectEntityAndEndedAtGreaterThan(takenSubjectEntity, userEntity.getYear());
+            SubjectTypeEntity subjectTypeEntity = optionalSubjectType.get();
+            if (takenSubjectEntity.getDeletedAt() <= currentYear) {
+                if (subjectTypeEntity.getType().equals(Type.MAJOR_REQUIRED.toString()))
+                    totalRequiredCredit += takenSubjectEntity.getCredit();
+                else totalElectiveCredit += takenSubjectEntity.getCredit();
+            }
+        }
+        GraduationResponse graduationResponse = GraduationResponse.toGraduationResponse(optionalGraduation.get(),
+                totalRequiredCredit, totalElectiveCredit, notTakenRequiredSubjects);
+        return graduationResponse;
+    }
+
     public List<String> extractSubjectTracks(SubjectEntity subjectEntity) {
         List<String> tracks = new ArrayList<>();
         List<CurriculumEntity> curriculumEntityList = subjectEntity.getCurriculumEntityList();
@@ -83,6 +124,7 @@ public class CourseService {
     }
 
     public boolean isTakenSubject(SubjectEntity subjectEntity, UserEntity userEntity) {
+        if (subjectEntity == null) return false;
         Optional<HistoryEntity> optionalHistoryEntity = historyRepository.findByUserEntityAndSubjectEntity(userEntity, subjectEntity);
         return optionalHistoryEntity.isPresent();
     }
@@ -90,6 +132,24 @@ public class CourseService {
     public Page<HistoryEntity> findHistories(UserEntity userEntity, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page-1, size);
         return historyRepository.findAllByUserEntityOrderByIdAsc(userEntity, pageRequest);
+    }
+
+    public SubjectEntity getEquivalenceSubject(SubjectEntity subjectEntity) {
+        Optional<SubjectEquivalenceEntity> optionalSubjectEquivalence = subjectEquivalenceRepository
+                .findByOriginalSubjectEntity(subjectEntity);
+        if (optionalSubjectEquivalence.isPresent()) {
+            return optionalSubjectEquivalence.get().getEquivalenceSubjectEntity();
+        }
+        return null;
+    }
+
+    public SubjectEntity getOriginalSubject(SubjectEntity subjectEntity) {
+        Optional<SubjectEquivalenceEntity> optionalSubjectEquivalence = subjectEquivalenceRepository
+                .findByEquivalenceSubjectEntity(subjectEntity);
+        if (optionalSubjectEquivalence.isPresent()) {
+            return optionalSubjectEquivalence.get().getOriginalSubjectEntity();
+        }
+        return null;
     }
 
     @Transactional

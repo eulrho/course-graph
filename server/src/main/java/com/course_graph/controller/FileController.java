@@ -40,4 +40,10 @@ public class FileController {
 //        fileService.graduationFileUpload(file);
 //        return new ResponseEntity<>(new CommonResponse("파일이 업로드되었습니다."), HttpStatus.CREATED);
 //    }
+//
+//    @PostMapping("/api/equivalence-upload")
+//    public ResponseEntity<CommonResponse> equivalenceFileUpload(@RequestBody MultipartFile file) {
+//        fileService.equivalenceFileUpload(file);
+//        return new ResponseEntity<>(new CommonResponse("파일이 업로드되었습니다."), HttpStatus.CREATED);
+//    }
 }

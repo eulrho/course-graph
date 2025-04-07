@@ -37,6 +37,7 @@ public class SecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/api/subject-upload")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/api/curriculum-upload")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/api/graduation-upload")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api/equivalence-upload")).permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider, tokenRepository), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling((exceptionHandling) -> exceptionHandling

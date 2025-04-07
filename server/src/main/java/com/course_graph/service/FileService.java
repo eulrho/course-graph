@@ -31,6 +31,7 @@ public class FileService {
     private final CurriculumRepository curriculumRepository;
     private final SubjectTypeRepository subjectTypeRepository;
     private final GraduationRepository graduationRepository;
+    private final SubjectEquivalenceRepository subjectEquivalenceRepository;
 
     @Transactional
     public void historyFileUpload(MultipartFile file, String email) {
@@ -78,10 +79,23 @@ public class FileService {
         try {
             List<List<String>> resultData = readFile(file, "연도", "");
             if (resultData.isEmpty()) throw new Exception("");
+            saveGraduationFile(resultData);
+        } catch (IOException e) {
+            throw new RestApiException(CustomErrorCode.FAIL_TO_UPLOAD_FILE);
+        } catch (Exception e) {
+            throw new RestApiException(CustomErrorCode.INVALID_FILE);
+        }
+    }
+
+    @Transactional
+    public void equivalenceFileUpload(MultipartFile file) {
+        try {
+            List<List<String>> resultData = readFile(file, "폐강 교과목번호", "");
+            if (resultData.isEmpty()) throw new Exception("");
             for (List<String> row : resultData) {
                 System.out.println(row);
             }
-            saveGraduationFile(resultData);
+            saveEquivalenceFile(resultData);
         } catch (IOException e) {
             throw new RestApiException(CustomErrorCode.FAIL_TO_UPLOAD_FILE);
         } catch (Exception e) {
@@ -300,6 +314,44 @@ public class FileService {
                 throw new RestApiException(CustomErrorCode.INVALID_FILE);
             GraduationEntity graduationEntity = GraduationEntity.toGraduationEntity(year, requiredMinCredit, electiveMinCredit);
             graduationRepository.save(graduationEntity);
+        }
+    }
+
+    @Transactional
+    public void saveEquivalenceFile(List<List<String>> fileData) {
+        List<String> columns = fileData.get(0);
+
+        for (int i = 1; i < fileData.size(); i++) {
+            List<String> row = fileData.get(i);
+            String originalCode = "", originalName = "", equivalenceCode = "", equivalenceName = "";
+            for (int j = 0; j < columns.size(); j++) {
+                String column = columns.get(j);
+                String value = row.get(j);
+                switch (column) {
+                    case "폐강 교과목번호":
+                        originalCode = value;
+                        break;
+                    case "폐강 교과목명":
+                        originalName = value;
+                        break;
+                    case "대체된 교과목번호":
+                        equivalenceCode = value;
+                        break;
+                    case "대체된 교과목명":
+                        equivalenceName = value;
+                        break;
+                }
+            }
+
+            if (originalCode.isEmpty() || originalName.isEmpty() || equivalenceCode.isEmpty() || equivalenceName.isEmpty())
+                throw new RestApiException(CustomErrorCode.INVALID_FILE);
+
+            Optional<SubjectEntity> optionalOriginalSubject = subjectRepository.findByCodeAndName(originalCode, originalName);
+            Optional<SubjectEntity> optionalEquivalenceSubject = subjectRepository.findByCodeAndName(equivalenceCode, equivalenceName);
+            if (optionalOriginalSubject.isEmpty() || optionalEquivalenceSubject.isEmpty())
+                throw new RestApiException(CustomErrorCode.INVALID_FILE);
+            SubjectEquivalenceEntity subjectEquivalenceEntity = SubjectEquivalenceEntity.toSubjectEquivalenceEntity(optionalOriginalSubject.get(), optionalEquivalenceSubject.get());
+            subjectEquivalenceRepository.save(subjectEquivalenceEntity);
         }
     }
 

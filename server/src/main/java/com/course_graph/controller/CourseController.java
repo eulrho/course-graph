@@ -47,4 +47,10 @@ public class CourseController {
         courseService.updateUserScores(updateRequests, auth.getName());
         return new ResponseEntity<>(new CommonResponse("수정 사항이 반영되었습니다."),HttpStatus.OK);
     }
+
+    @GetMapping("/api/graduation")
+    public ResponseEntity<GraduationResponse> getGraduationInfo(Authentication auth) {
+        GraduationResponse graduationResponse = courseService.getUserGraduationInfo(auth.getName());
+        return new ResponseEntity<>(graduationResponse, HttpStatus.OK);
+    }
 }
