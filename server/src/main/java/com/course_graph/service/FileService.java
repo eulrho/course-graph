@@ -1,16 +1,14 @@
 package com.course_graph.service;
 
 import com.course_graph.Exception.RestApiException;
-import com.course_graph.entity.CurriculumEntity;
-import com.course_graph.entity.HistoryEntity;
-import com.course_graph.entity.SubjectEntity;
-import com.course_graph.entity.UserEntity;
+import com.course_graph.entity.*;
 import com.course_graph.enums.CustomErrorCode;
 import com.course_graph.enums.Track;
 import com.course_graph.enums.Type;
 import com.course_graph.repository.CurriculumRepository;
 import com.course_graph.repository.HistoryRepository;
 import com.course_graph.repository.SubjectRepository;
+import com.course_graph.repository.SubjectTypeRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -34,6 +32,7 @@ public class FileService {
     private final UserService userService;
     private final HistoryRepository historyRepository;
     private final CurriculumRepository curriculumRepository;
+    private final SubjectTypeRepository subjectTypeRepository;
 
     @Transactional
     public void historyFileUpload(MultipartFile file, String email) {
@@ -65,6 +64,22 @@ public class FileService {
 
     @Transactional
     public void curriculumFileUpload(MultipartFile file) {
+        try {
+            List<List<String>> resultData = readFile(file, "트랙명", "");
+            if (resultData.isEmpty()) throw new Exception("");
+            for (List<String> data : resultData) {
+                System.out.println(data);
+            }
+            saveCurriculumFile(resultData);
+        } catch (IOException e) {
+            throw new RestApiException(CustomErrorCode.FAIL_TO_UPLOAD_FILE);
+        } catch (Exception e) {
+            throw new RestApiException(CustomErrorCode.INVALID_FILE);
+        }
+    }
+
+    @Transactional
+    public void graduationFileUpload(MultipartFile file) {
         try {
             List<List<String>> resultData = readFile(file, "트랙명", "");
             if (resultData.isEmpty()) throw new Exception("");
@@ -208,11 +223,23 @@ public class FileService {
             if (optionalSubject.isPresent()) {
                 SubjectEntity subjectEntity = optionalSubject.get();
                 subjectEntity.extendDeletedAt(year + 1);
+
+                List<SubjectTypeEntity> subjectTypeEntityList = subjectTypeRepository.findAllBySubjectEntityOrderByEndedAtDesc(subjectEntity);
+                SubjectTypeEntity subjectTypeEntity = subjectTypeEntityList.get(0);
+
+                if (subjectTypeEntity.getType().equals(type.toString())) // 이수구분 유지
+                    subjectTypeEntity.extendEndedAt(year + 1);
+                else { // 이수구분 변경
+                    SubjectTypeEntity newSubjectTypeEntity = SubjectTypeEntity.toSubjectTypeEntity(subjectEntity, type.toString(), year, year + 1);
+                    subjectTypeRepository.save(newSubjectTypeEntity);
+                }
             }
             else {
                 if (code.isEmpty() || name.isEmpty() || credit == -1 || grade.isEmpty() || type == null) continue ;
-                SubjectEntity subjectEntity = SubjectEntity.toSubjectEntity(code, name, credit, grade, type.toString(), year, year + 1);
+                SubjectEntity subjectEntity = SubjectEntity.toSubjectEntity(code, name, credit, grade, year, year + 1);
                 subjectRepository.save(subjectEntity);
+                SubjectTypeEntity subjectTypeEntity = SubjectTypeEntity.toSubjectTypeEntity(subjectEntity, type.toString(), year, year + 1);
+                subjectTypeRepository.save(subjectTypeEntity);
             }
         }
     }
