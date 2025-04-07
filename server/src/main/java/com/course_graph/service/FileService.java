@@ -5,10 +5,7 @@ import com.course_graph.entity.*;
 import com.course_graph.enums.CustomErrorCode;
 import com.course_graph.enums.Track;
 import com.course_graph.enums.Type;
-import com.course_graph.repository.CurriculumRepository;
-import com.course_graph.repository.HistoryRepository;
-import com.course_graph.repository.SubjectRepository;
-import com.course_graph.repository.SubjectTypeRepository;
+import com.course_graph.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -33,6 +30,7 @@ public class FileService {
     private final HistoryRepository historyRepository;
     private final CurriculumRepository curriculumRepository;
     private final SubjectTypeRepository subjectTypeRepository;
+    private final GraduationRepository graduationRepository;
 
     @Transactional
     public void historyFileUpload(MultipartFile file, String email) {
@@ -67,9 +65,6 @@ public class FileService {
         try {
             List<List<String>> resultData = readFile(file, "트랙명", "");
             if (resultData.isEmpty()) throw new Exception("");
-            for (List<String> data : resultData) {
-                System.out.println(data);
-            }
             saveCurriculumFile(resultData);
         } catch (IOException e) {
             throw new RestApiException(CustomErrorCode.FAIL_TO_UPLOAD_FILE);
@@ -81,12 +76,12 @@ public class FileService {
     @Transactional
     public void graduationFileUpload(MultipartFile file) {
         try {
-            List<List<String>> resultData = readFile(file, "트랙명", "");
+            List<List<String>> resultData = readFile(file, "연도", "");
             if (resultData.isEmpty()) throw new Exception("");
-            for (List<String> data : resultData) {
-                System.out.println(data);
+            for (List<String> row : resultData) {
+                System.out.println(row);
             }
-            saveCurriculumFile(resultData);
+            saveGraduationFile(resultData);
         } catch (IOException e) {
             throw new RestApiException(CustomErrorCode.FAIL_TO_UPLOAD_FILE);
         } catch (Exception e) {
@@ -133,12 +128,13 @@ public class FileService {
 
         for (Row row : sheet) {
             Cell firstCell = row.getCell(0);
-            if (firstCell != null && firstCell.getCellType() == CellType.STRING) {
-                String cellValue = firstCell.getStringCellValue();
-
-                if (cellValue.equals(startPoint)) // start of data
-                    startFound = true;
-                if (cellValue.equals(endPoint) && startFound) break ; // end of data
+            if (firstCell != null && firstCell.getCellType() != CellType.BLANK) {
+                if (firstCell.getCellType() == CellType.STRING) {
+                    String cellValue = firstCell.getStringCellValue();
+                    if (cellValue.equals(startPoint)) // start of data
+                        startFound = true;
+                    if (cellValue.equals(endPoint) && startFound) break ; // end of data
+                }
                 if (startFound) {
                     if (attributeIndexes.isEmpty()) findAttributeIndexes(attributeIndexes, row);
                     List<String> rowData = new ArrayList<>();
@@ -274,6 +270,36 @@ public class FileService {
             if (optionalSubject.isEmpty() || track == null) throw new RestApiException(CustomErrorCode.INVALID_FILE);
             CurriculumEntity curriculumEntity = CurriculumEntity.toCurriculumEntity(optionalSubject.get(), track);
             curriculumRepository.save(curriculumEntity);
+        }
+    }
+
+    @Transactional
+    public void saveGraduationFile(List<List<String>> fileData) {
+        List<String> columns = fileData.get(0);
+
+        for (int i = 1; i < fileData.size(); i++) {
+            List<String> row = fileData.get(i);
+            int year = -1, requiredMinCredit = -1, electiveMinCredit = -1;
+            for (int j = 0; j < columns.size(); j++) {
+                String column = columns.get(j);
+                String value = row.get(j);
+                switch (column) {
+                    case "연도":
+                        year = parseInt(value);
+                        break;
+                    case "전공 필수 최소 학점":
+                        requiredMinCredit = parseInt(value);
+                        break;
+                    case "전공 선택 최소 학점":
+                        electiveMinCredit = parseInt(value);
+                        break;
+                }
+            }
+
+            if (year == -1 || requiredMinCredit == -1 || electiveMinCredit == -1)
+                throw new RestApiException(CustomErrorCode.INVALID_FILE);
+            GraduationEntity graduationEntity = GraduationEntity.toGraduationEntity(year, requiredMinCredit, electiveMinCredit);
+            graduationRepository.save(graduationEntity);
         }
     }
 

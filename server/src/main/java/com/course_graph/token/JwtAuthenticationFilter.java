@@ -41,7 +41,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     public boolean isPassURI(String requestURI) {
         return requestURI.equals("/api/join") || requestURI.equals("/api/login") || requestURI.equals("/api/send-mail")
-                || requestURI.equals("/api/verify-mail") || requestURI.equals("/api/subject-upload") || requestURI.equals("/api/curriculum-upload");
+                || requestURI.equals("/api/verify-mail") || requestURI.equals("/api/subject-upload") || requestURI.equals("/api/curriculum-upload")
+                || requestURI.equals("/api/graduation-upload");
     }
 
     public static void setErrorResponse(HttpServletResponse response, ErrorCode ErrorCode) throws IOException {

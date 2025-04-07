@@ -22,17 +22,22 @@ public class FileController {
         return new ResponseEntity<>(new CommonResponse("파일이 업로드되었습니다."), HttpStatus.CREATED);
     }
 
-//    // initialize subject
+//    // 편의상 db 초기화를 위해 선언해둠. 추후 db 초기화 파일로 대체 예정
 //    @PostMapping("/api/subject-upload")
 //    public ResponseEntity<CommonResponse> subjectFileUpload(@RequestBody MultipartFile file, int year) {
 //        fileService.subjectFileUpload(file, year);
 //        return new ResponseEntity<>(new CommonResponse("파일이 업로드되었습니다."), HttpStatus.CREATED);
 //    }
 //
-//    // initialize curriculum
 //    @PostMapping("/api/curriculum-upload")
 //    public ResponseEntity<CommonResponse> curriculumFileUpload(@RequestBody MultipartFile file) {
 //        fileService.curriculumFileUpload(file);
+//        return new ResponseEntity<>(new CommonResponse("파일이 업로드되었습니다."), HttpStatus.CREATED);
+//    }
+
+//    @PostMapping("/api/graduation-upload")
+//    public ResponseEntity<CommonResponse> graduationFileUpload(@RequestBody MultipartFile file) {
+//        fileService.graduationFileUpload(file);
 //        return new ResponseEntity<>(new CommonResponse("파일이 업로드되었습니다."), HttpStatus.CREATED);
 //    }
 }
