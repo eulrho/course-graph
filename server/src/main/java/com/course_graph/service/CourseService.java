@@ -38,7 +38,7 @@ public class CourseService {
         UserEntity userEntity = userService.getLoginUserByEmail(email);
         List<CourseStatusDTO> courseStatusDTOList = new ArrayList<>();
         List<SubjectEntity> subjectEntityList = subjectRepository.findAllByDeletedAtGreaterThan(currentYear);
-        for (SubjectEntity subjectEntity : subjectEntityList) {
+        for (SubjectEntity subjectEntity : subjectEntityList) { // 현재 연도 기준 존재하는 과목 추가
             CourseDTO courseDTO = CourseDTO.toCourseDTO(subjectEntity.getName(), extractSubjectTracks(subjectEntity), subjectEntity.getGrade());
             CourseStatusDTO courseStatusDTO = new CourseStatusDTO(courseDTO, SubjectStatus.NOT_TAKEN.toString());
             if (isTakenSubject(subjectEntity, userEntity))
@@ -47,7 +47,7 @@ public class CourseService {
         }
 
         List<HistoryEntity> historyEntityList = userEntity.getHistoryEntityList();
-        for (HistoryEntity data : historyEntityList) {
+        for (HistoryEntity data : historyEntityList) { // 폐강된 과목 중 수강했던 과목 추가
             SubjectEntity takenSubjectEntity = data.getSubjectEntity();
             if (takenSubjectEntity.getDeletedAt() <= currentYear) {
                 CourseDTO courseDTO = CourseDTO.toCourseDTO(takenSubjectEntity.getName(),
@@ -87,11 +87,11 @@ public class CourseService {
                     .findBySubjectEntityAndEndedAtGreaterThan(subjectEntity, userEntity.getYear());
             SubjectTypeEntity subjectTypeEntity = optionalSubjectType.get();
 
-            if (isTakenSubject(subjectEntity, userEntity)) {
+            if (isTakenSubject(subjectEntity, userEntity)) { // 수강 학점 계산
                 if (subjectTypeEntity.getType().equals(Type.MAJOR_REQUIRED.toString()))
                     totalRequiredCredit += subjectEntity.getCredit();
                 else totalElectiveCredit += subjectEntity.getCredit();
-            } else {
+            } else { // 미이수 전공필수 과목 리스트에 추가
                 if (subjectTypeEntity.getType().equals(Type.MAJOR_REQUIRED.toString())
                         && !isTakenSubject(getOriginalSubject(subjectEntity), userEntity))
                     notTakenRequiredSubjects.add(subjectEntity.getName());
@@ -104,7 +104,7 @@ public class CourseService {
             Optional<SubjectTypeEntity> optionalSubjectType = subjectTypeRepository
                     .findBySubjectEntityAndEndedAtGreaterThan(takenSubjectEntity, userEntity.getYear());
             SubjectTypeEntity subjectTypeEntity = optionalSubjectType.get();
-            if (takenSubjectEntity.getDeletedAt() <= currentYear) {
+            if (takenSubjectEntity.getDeletedAt() <= currentYear) { // 폐강된 과목 수강 학점 계산
                 if (subjectTypeEntity.getType().equals(Type.MAJOR_REQUIRED.toString()))
                     totalRequiredCredit += takenSubjectEntity.getCredit();
                 else totalElectiveCredit += takenSubjectEntity.getCredit();

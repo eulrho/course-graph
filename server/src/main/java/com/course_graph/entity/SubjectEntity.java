@@ -34,10 +34,6 @@ public class SubjectEntity {
     @Column(nullable = false)
     private int deletedAt;
 
-    // subject-subject join table
-    @OneToMany(mappedBy = "subjectEntity", cascade = CascadeType.ALL)
-    private List<HistoryEntity> historyEntityList = new ArrayList<>();
-
     @OneToMany(mappedBy = "subjectEntity", cascade = CascadeType.ALL)
     private List<CurriculumEntity> curriculumEntityList = new ArrayList<>();
 
@@ -55,5 +51,9 @@ public class SubjectEntity {
 
     public void extendDeletedAt(int newDeletedAt) {
         this.deletedAt = newDeletedAt;
+    }
+
+    public void addCurriculum(CurriculumEntity curriculumEntity) {
+        this.curriculumEntityList.add(curriculumEntity);
     }
 }

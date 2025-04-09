@@ -289,8 +289,11 @@ public class FileService {
 
             Optional<SubjectEntity> optionalSubject = subjectRepository.findByCodeAndName(subjectCode, name);
             if (optionalSubject.isEmpty() || track == null) throw new RestApiException(CustomErrorCode.INVALID_FILE);
-            CurriculumEntity curriculumEntity = CurriculumEntity.toCurriculumEntity(optionalSubject.get(), track);
+
+            SubjectEntity subjectEntity = optionalSubject.get();
+            CurriculumEntity curriculumEntity = CurriculumEntity.toCurriculumEntity(subjectEntity, track);
             curriculumRepository.save(curriculumEntity);
+            subjectEntity.addCurriculum(curriculumEntity);
         }
     }
 
