@@ -190,6 +190,13 @@ public class FileService {
             Optional<SubjectEntity> optionalSubject = subjectRepository.findByCodeAndDeletedAtGreaterThan(subjectCode, year);
             if (optionalSubject.isEmpty()) continue ;
 
+            SubjectEntity subjectEntity = optionalSubject.get();
+            Optional<HistoryEntity> optionalHistory = historyRepository.findByUserEntityAndSubjectEntity(userEntity, subjectEntity);
+            if (optionalHistory.isPresent()) { // 수강 이력이 이미 존재하는 경우 성적 갱신만 진행
+                HistoryEntity historyEntity = optionalHistory.get();
+                historyEntity.edit(score);
+                continue ;
+            }
             HistoryEntity historyEntity = HistoryEntity.toHistoryEntity(userEntity, optionalSubject.get(), score);
             userEntity.addHistory(historyEntity);
             historyRepository.save(historyEntity);
