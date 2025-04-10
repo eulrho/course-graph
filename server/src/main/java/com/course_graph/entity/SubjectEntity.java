@@ -37,6 +37,9 @@ public class SubjectEntity {
     @OneToMany(mappedBy = "subjectEntity", cascade = CascadeType.ALL)
     private List<CurriculumEntity> curriculumEntityList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "subjectEntity", cascade = CascadeType.ALL)
+    private List<ScheduleEntity> scheduleEntityList = new ArrayList<>();
+
     @Builder
     public static SubjectEntity toSubjectEntity(String code, String name, int credit, String grade, int createdAt, int deletedAt) {
         SubjectEntity subjectEntity = new SubjectEntity();
@@ -55,5 +58,9 @@ public class SubjectEntity {
 
     public void addCurriculum(CurriculumEntity curriculumEntity) {
         this.curriculumEntityList.add(curriculumEntity);
+    }
+
+    public void addSchedule(ScheduleEntity scheduleEntity) {
+        this.scheduleEntityList.add(scheduleEntity);
     }
 }

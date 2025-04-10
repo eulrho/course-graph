@@ -34,7 +34,7 @@ public class FileController {
 //        fileService.curriculumFileUpload(file);
 //        return new ResponseEntity<>(new CommonResponse("파일이 업로드되었습니다."), HttpStatus.CREATED);
 //    }
-
+//
 //    @PostMapping("/api/graduation-upload")
 //    public ResponseEntity<CommonResponse> graduationFileUpload(@RequestBody MultipartFile file) {
 //        fileService.graduationFileUpload(file);
@@ -46,4 +46,10 @@ public class FileController {
 //        fileService.equivalenceFileUpload(file);
 //        return new ResponseEntity<>(new CommonResponse("파일이 업로드되었습니다."), HttpStatus.CREATED);
 //    }
+
+    @PostMapping("/api/schedule-upload")
+    public ResponseEntity<CommonResponse> scheduleFileUpload(@RequestBody MultipartFile file) {
+        fileService.scheduleFileUpload(file);
+        return new ResponseEntity<>(new CommonResponse("파일이 업로드되었습니다."), HttpStatus.CREATED);
+    }
 }

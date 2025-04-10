@@ -1,6 +1,8 @@
 package com.course_graph.service;
 
 import com.course_graph.Exception.RestApiException;
+import com.course_graph.dto.ScheduleDTO;
+import com.course_graph.dto.ClassroomDTO;
 import com.course_graph.entity.*;
 import com.course_graph.enums.CustomErrorCode;
 import com.course_graph.enums.Track;
@@ -32,6 +34,7 @@ public class FileService {
     private final SubjectTypeRepository subjectTypeRepository;
     private final GraduationRepository graduationRepository;
     private final SubjectEquivalenceRepository subjectEquivalenceRepository;
+    private final ScheduleRepository scheduleRepository;
 
     @Transactional
     public void historyFileUpload(MultipartFile file, String email) {
@@ -92,10 +95,23 @@ public class FileService {
         try {
             List<List<String>> resultData = readFile(file, "폐강 교과목번호", "");
             if (resultData.isEmpty()) throw new Exception("");
+            saveEquivalenceFile(resultData);
+        } catch (IOException e) {
+            throw new RestApiException(CustomErrorCode.FAIL_TO_UPLOAD_FILE);
+        } catch (Exception e) {
+            throw new RestApiException(CustomErrorCode.INVALID_FILE);
+        }
+    }
+
+    @Transactional
+    public void scheduleFileUpload(MultipartFile file) {
+        try {
+            List<List<String>> resultData = readFile(file, "순번", "");
+            if (resultData.isEmpty()) throw new Exception("");
             for (List<String> row : resultData) {
                 System.out.println(row);
             }
-            saveEquivalenceFile(resultData);
+            saveScheduleFile(resultData);
         } catch (IOException e) {
             throw new RestApiException(CustomErrorCode.FAIL_TO_UPLOAD_FILE);
         } catch (Exception e) {
@@ -363,6 +379,67 @@ public class FileService {
             SubjectEquivalenceEntity subjectEquivalenceEntity = SubjectEquivalenceEntity.toSubjectEquivalenceEntity(optionalOriginalSubject.get(), optionalEquivalenceSubject.get());
             subjectEquivalenceRepository.save(subjectEquivalenceEntity);
         }
+    }
+
+    @Transactional
+    public void saveScheduleFile(List<List<String>> fileData) {
+        List<String> columns = fileData.get(0);
+
+        for (int i = 1; i < fileData.size(); i++) {
+            List<String> row = fileData.get(i);
+            ScheduleDTO scheduleDTO = new ScheduleDTO();
+            for (int j = 0; j < columns.size(); j++) {
+                String column = columns.get(j);
+                String value = row.get(j);
+                switch (column) {
+                    case "과목코드":
+                        scheduleDTO.setCode(value);
+                        break;
+                    case "과목명":
+                        scheduleDTO.setName(value);
+                        break;
+                    case "분반":
+                        scheduleDTO.setClassNumber(parseInt(value));
+                        break;
+                    case "담당교수":
+                        scheduleDTO.setProfessor(value);
+                        break;
+                    case "수업시간":
+                        extractClassroom(scheduleDTO, value);
+                        break;
+                }
+            }
+
+            Optional<SubjectEntity> optionalSubject = subjectRepository.findByCodeAndName(
+                    scheduleDTO.getCode(), scheduleDTO.getName());
+            if (optionalSubject.isEmpty())
+                throw new RestApiException(CustomErrorCode.INVALID_FILE);
+            SubjectEntity subjectEntity = optionalSubject.get();
+            for (ClassroomDTO classroomDTO : scheduleDTO.getClassroomList()) {
+                ScheduleEntity scheduleEntity = ScheduleEntity.toScheduleEntity(subjectEntity,
+                        scheduleDTO.getClassNumber(), classroomDTO.getRoom(), classroomDTO.getTime(), scheduleDTO.getProfessor());
+                subjectEntity.addSchedule(scheduleEntity);
+                scheduleRepository.save(scheduleEntity);
+            }
+        }
+    }
+
+    public void extractClassroom(ScheduleDTO scheduleDTO, String data) {
+        List<ClassroomDTO> classroomList = new ArrayList<>();
+        for (int i = 0; i < data.length(); i++) {
+            int idx = data.indexOf("[", i);
+            if (idx == -1) throw new RestApiException(CustomErrorCode.INVALID_FILE);
+            int endIdx = data.indexOf("]", i);
+            if (endIdx == -1) throw new RestApiException(CustomErrorCode.INVALID_FILE);
+
+            ClassroomDTO classroomDTO = new ClassroomDTO();
+            classroomDTO.setTime(data.substring(i, idx - 1));
+            classroomDTO.setRoom(data.substring(idx + 1, endIdx));
+            classroomList.add(classroomDTO);
+
+            i = endIdx + 2;
+        }
+        scheduleDTO.setClassroomList(classroomList);
     }
 
     private int parseInt(String value) {
