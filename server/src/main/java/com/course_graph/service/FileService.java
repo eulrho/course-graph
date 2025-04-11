@@ -260,10 +260,10 @@ public class FileService {
                 List<SubjectTypeEntity> subjectTypeEntityList = subjectTypeRepository.findAllBySubjectEntityOrderByEndedAtDesc(subjectEntity);
                 SubjectTypeEntity subjectTypeEntity = subjectTypeEntityList.get(0);
 
-                if (subjectTypeEntity.getType().equals(type.toString())) // 이수구분 유지
+                if (subjectTypeEntity.getType().equals(type.name())) // 이수구분 유지
                     subjectTypeEntity.extendEndedAt(year + 1);
                 else { // 이수구분 변경
-                    SubjectTypeEntity newSubjectTypeEntity = SubjectTypeEntity.toSubjectTypeEntity(subjectEntity, type.toString(), year, year + 1);
+                    SubjectTypeEntity newSubjectTypeEntity = SubjectTypeEntity.toSubjectTypeEntity(subjectEntity, type, year, year + 1);
                     subjectTypeRepository.save(newSubjectTypeEntity);
                 }
             }
@@ -271,7 +271,7 @@ public class FileService {
                 if (code.isEmpty() || name.isEmpty() || credit == -1 || grade.isEmpty() || type == null) continue ;
                 SubjectEntity subjectEntity = SubjectEntity.toSubjectEntity(code, name, credit, grade, year, year + 1);
                 subjectRepository.save(subjectEntity);
-                SubjectTypeEntity subjectTypeEntity = SubjectTypeEntity.toSubjectTypeEntity(subjectEntity, type.toString(), year, year + 1);
+                SubjectTypeEntity subjectTypeEntity = SubjectTypeEntity.toSubjectTypeEntity(subjectEntity, type, year, year + 1);
                 subjectTypeRepository.save(subjectTypeEntity);
             }
         }

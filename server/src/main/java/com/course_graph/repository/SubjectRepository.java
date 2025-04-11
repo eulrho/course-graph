@@ -14,4 +14,5 @@ public interface SubjectRepository extends JpaRepository<SubjectEntity, Long> {
     Optional<SubjectEntity> findByCodeAndDeletedAtGreaterThan(String code, int deletedAt);
     Optional<SubjectEntity> findByName(String name);
     List<SubjectEntity> findAllByGrade(String grade);
+    List<SubjectEntity> findAllByDeletedAt(int deletedAt);
 }

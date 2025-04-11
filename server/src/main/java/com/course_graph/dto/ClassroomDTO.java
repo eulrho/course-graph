@@ -11,4 +11,11 @@ import lombok.Setter;
 public class ClassroomDTO {
     String time;
     String room;
+
+    public static ClassroomDTO toClassroomDTO(String time, String room) {
+        ClassroomDTO classroomDTO = new ClassroomDTO();
+        classroomDTO.setTime(time);
+        classroomDTO.setRoom(room);
+        return classroomDTO;
+    }
 }

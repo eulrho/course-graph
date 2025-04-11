@@ -1,10 +1,13 @@
 package com.course_graph.enums;
 
-public enum Type {
-    MAJOR_ELECTIVE, MAJOR_REQUIRED;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-    @Override
-    public String toString() {
-        return name();
-    }
+@AllArgsConstructor
+@Getter
+public enum Type {
+    MAJOR_ELECTIVE("전공 선택"),
+    MAJOR_REQUIRED("전공 필수");
+
+    private String message;
 }

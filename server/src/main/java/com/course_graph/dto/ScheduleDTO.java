@@ -1,5 +1,7 @@
 package com.course_graph.dto;
 
+import com.course_graph.entity.ScheduleEntity;
+import com.course_graph.entity.SubjectEntity;
 import com.course_graph.enums.Type;
 import lombok.*;
 
@@ -19,20 +21,16 @@ public class ScheduleDTO {
     private int classNumber;
     private List<ClassroomDTO> classroomList;
 
-    public static ScheduleDTO toScheduleDTO(String code, String name, int credit, String grade, Type type, String professor, int classNumber, List<ClassroomDTO> classroomList) {
+    public static ScheduleDTO toScheduleDTO(SubjectEntity subjectEntity, Type type, ScheduleEntity scheduleEntity, List<ClassroomDTO> classroomList) {
         ScheduleDTO scheduleDTO = new ScheduleDTO();
-        scheduleDTO.setCode(code);
-        scheduleDTO.setName(name);
-        scheduleDTO.setCredit(credit);
-        scheduleDTO.setGrade(grade);
-        scheduleDTO.setType(type);
-        scheduleDTO.setProfessor(professor);
-        scheduleDTO.setClassNumber(classNumber);
+        scheduleDTO.setCode(subjectEntity.getCode());
+        scheduleDTO.setName(subjectEntity.getName());
+        scheduleDTO.setCredit(subjectEntity.getCredit());
+        scheduleDTO.setGrade(subjectEntity.getGrade());
+        scheduleDTO.setType(type.getMessage());
+        scheduleDTO.setProfessor(scheduleEntity.getProfessor());
+        scheduleDTO.setClassNumber(scheduleEntity.getClassNumber());
         scheduleDTO.setClassroomList(classroomList);
         return scheduleDTO;
-    }
-
-    public void setType(Type type) {
-        this.type = type.toString();
     }
 }
