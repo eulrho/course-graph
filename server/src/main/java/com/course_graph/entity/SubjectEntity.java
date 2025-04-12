@@ -3,6 +3,7 @@ package com.course_graph.entity;
 import com.course_graph.dto.ScheduleDTO;
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -11,7 +12,9 @@ import java.util.List;
 @Entity
 @Getter
 @Table(name = "subject")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class SubjectEntity {
+    @EqualsAndHashCode.Include
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

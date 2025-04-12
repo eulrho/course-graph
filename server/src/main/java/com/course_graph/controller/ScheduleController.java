@@ -24,4 +24,10 @@ public class ScheduleController {
         List<ScheduleDTO> scheduleDTOList = scheduleService.getAllSchedules();
         return new ResponseEntity<>(scheduleDTOList, HttpStatus.OK);
     }
+
+    @GetMapping("/api/schedule")
+    public ResponseEntity<List<ScheduleDTO>> getUserSchedules(Authentication auth) {
+        List<ScheduleDTO> scheduleDTOList = scheduleService.getUserSchedules(auth.getName());
+        return new ResponseEntity<>(scheduleDTOList, HttpStatus.OK);
+    }
 }
