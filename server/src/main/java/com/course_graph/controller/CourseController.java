@@ -36,7 +36,7 @@ public class CourseController {
         return new ResponseEntity<>(courseStatusDTOList, HttpStatus.OK);
     }
 
-    @PatchMapping("/api/subjects")
+    @PostMapping("/api/subjects")
     public ResponseEntity<CommonResponse> updateTakenSubjectList(@RequestBody List<StatusUpdateRequest> updateRequests, Authentication auth) {
         courseService.updateUserTakenSubjectList(updateRequests, auth.getName());
         return new ResponseEntity<>(new CommonResponse("수정 사항이 반영되었습니다."), HttpStatus.OK);
