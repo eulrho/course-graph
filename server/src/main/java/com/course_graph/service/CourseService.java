@@ -134,15 +134,6 @@ public class CourseService {
         return historyRepository.findAllByUserEntityOrderByIdAsc(userEntity, pageRequest);
     }
 
-    public SubjectEntity getEquivalenceSubject(SubjectEntity subjectEntity) {
-        Optional<SubjectEquivalenceEntity> optionalSubjectEquivalence = subjectEquivalenceRepository
-                .findByOriginalSubjectEntity(subjectEntity);
-        if (optionalSubjectEquivalence.isPresent()) {
-            return optionalSubjectEquivalence.get().getEquivalenceSubjectEntity();
-        }
-        return null;
-    }
-
     public SubjectEntity getOriginalSubject(SubjectEntity subjectEntity) {
         Optional<SubjectEquivalenceEntity> optionalSubjectEquivalence = subjectEquivalenceRepository
                 .findByEquivalenceSubjectEntity(subjectEntity);
@@ -157,7 +148,12 @@ public class CourseService {
         UserEntity userEntity = userService.getLoginUserByEmail(email);
         for (ScoreUpdateRequest updateRequest : updateRequests) {
             Optional<SubjectEntity> optionalSubject = subjectRepository.findByName(updateRequest.getSubjectName());
+            // 수정할 과목이 존재하는지 확인
+            if (optionalSubject.isEmpty()) throw new RestApiException(CustomErrorCode.INVALID_PARAMETER);
             Optional<HistoryEntity> optionalHistory = historyRepository.findByUserEntityAndSubjectEntity(userEntity, optionalSubject.get());
+            // 수정할 이력정보가 존재하는지 확인
+            if (optionalHistory.isEmpty()) throw new RestApiException(CustomErrorCode.INVALID_PARAMETER);
+
             HistoryEntity historyEntity = optionalHistory.get();
             historyEntity.edit(updateRequest.getScore());
         }
@@ -168,7 +164,11 @@ public class CourseService {
         UserEntity userEntity = userService.getLoginUserByEmail(email);
         for (StatusUpdateRequest updateRequest : updateRequests) {
             Optional<SubjectEntity> optionalSubject = subjectRepository.findByName(updateRequest.getSubjectName());
+            // 수정할 과목이 존재하는지 확인
+            if (optionalSubject.isEmpty()) throw new RestApiException(CustomErrorCode.INVALID_PARAMETER);
+
             Optional<HistoryEntity> optionalHistory = historyRepository.findByUserEntityAndSubjectEntity(userEntity, optionalSubject.get());
+
             if (updateRequest.getStatus().equals(SubjectStatus.TAKEN.toString())) {
                 if (optionalHistory.isPresent()) continue ;
                 HistoryEntity historyEntity = HistoryEntity.toHistoryEntity(userEntity, optionalSubject.get(), "");
@@ -176,7 +176,7 @@ public class CourseService {
             }
             else if (updateRequest.getStatus().equals(SubjectStatus.NOT_TAKEN.toString()))
                 optionalHistory.ifPresent(historyRepository::delete);
-            else throw new RestApiException(CustomErrorCode.INVALID_PARAMETER);
+            else throw new RestApiException(CustomErrorCode.INVALID_PARAMETER); // 잘못된 상태값
         }
     }
 }
