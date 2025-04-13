@@ -39,7 +39,7 @@ public class FileService {
     @Transactional
     public void historyFileUpload(MultipartFile file, String email) {
         try {
-            if (!isValidFile(file)) throw new Exception("");
+            if (!isValidFile(file)) throw new IOException("");
 
             List<List<String>> resultData = readFile(file, "구분", "자격종별");
             if (resultData.isEmpty()) throw new Exception("");
