@@ -31,12 +31,15 @@ public class ScheduleService {
     private final int currentYear = 2025;
     private final UserScheduleRepository userScheduleRepository;
 
-    public List<ScheduleDTO> getAllSchedules() {
+    public List<ScheduleDTO> getAllSchedules(String grade) {
         List<ScheduleEntity> scheduleEntityList = scheduleRepository.findAll();
         List<ScheduleDTO> scheduleDTOList = new ArrayList<>();
 
         HashMap<SubjectScheduleKey, ScheduleDTO> map = new HashMap<>();
-        for (ScheduleEntity scheduleEntity : scheduleEntityList) extractSchedules(map, scheduleEntity);
+        for (ScheduleEntity scheduleEntity : scheduleEntityList) {
+            if (!scheduleEntity.getSubjectEntity().getGrade().equals(grade)) continue;
+            extractSchedules(map, scheduleEntity);
+        }
         for (SubjectScheduleKey key : map.keySet()) scheduleDTOList.add(map.get(key));
         return scheduleDTOList;
     }

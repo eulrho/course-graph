@@ -18,8 +18,8 @@ public class ScheduleController {
     private final ScheduleService scheduleService;
 
     @GetMapping("/api/schedules")
-    public ResponseEntity<List<ScheduleDTO>> getAllSchedules() {
-        List<ScheduleDTO> scheduleDTOList = scheduleService.getAllSchedules();
+    public ResponseEntity<List<ScheduleDTO>> getAllSchedules(@RequestParam String grade) {
+        List<ScheduleDTO> scheduleDTOList = scheduleService.getAllSchedules(grade);
         return new ResponseEntity<>(scheduleDTOList, HttpStatus.OK);
     }
 

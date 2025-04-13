@@ -15,7 +15,6 @@ public class ScheduleDTO {
     private String code;
     private String name;
     private int credit;
-    private String grade;
     private String type;
     private String professor;
     private int classNumber;
@@ -26,7 +25,6 @@ public class ScheduleDTO {
         scheduleDTO.setCode(subjectEntity.getCode());
         scheduleDTO.setName(subjectEntity.getName());
         scheduleDTO.setCredit(subjectEntity.getCredit());
-        scheduleDTO.setGrade(subjectEntity.getGrade());
         scheduleDTO.setType(type.getMessage());
         scheduleDTO.setProfessor(scheduleEntity.getProfessor());
         scheduleDTO.setClassNumber(scheduleEntity.getClassNumber());

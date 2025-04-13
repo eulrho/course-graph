@@ -10,12 +10,10 @@ import lombok.Setter;
 @NoArgsConstructor
 public class SubjectDTO {
     private String name;
-    private String grade;
 
     public static SubjectDTO toSubjectDTO(SubjectEntity subjectEntity) {
         SubjectDTO subjectDTO = new SubjectDTO();
         subjectDTO.setName(subjectEntity.getName());
-        subjectDTO.setGrade(subjectEntity.getGrade());
         return subjectDTO;
     }
 }
