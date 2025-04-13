@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "171381851750",
+    "project_id": "coursegraph-51880",
+    "storage_bucket": "coursegraph-51880.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:171381851750:android:fc248a2e77f57799230fa7",
+        "android_client_info": {
+          "package_name": "com.happ.coursegraph"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWzWmYSgFpt_i1UzyNw43Pj3FlC51h5qM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
