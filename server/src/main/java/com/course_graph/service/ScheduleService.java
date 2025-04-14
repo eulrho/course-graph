@@ -1,17 +1,12 @@
 package com.course_graph.service;
 
 import com.course_graph.Exception.RestApiException;
-import com.course_graph.dto.ClassroomDTO;
-import com.course_graph.dto.ScheduleUpdateRequest;
-import com.course_graph.dto.ScheduleDTO;
+import com.course_graph.dto.*;
 import com.course_graph.entity.*;
 import com.course_graph.enums.CustomErrorCode;
 import com.course_graph.enums.ScheduleUpdateStatus;
 import com.course_graph.enums.Type;
-import com.course_graph.repository.ScheduleRepository;
-import com.course_graph.repository.SubjectRepository;
-import com.course_graph.repository.SubjectTypeRepository;
-import com.course_graph.repository.UserScheduleRepository;
+import com.course_graph.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +25,7 @@ public class ScheduleService {
     private final UserService userService;
     private final int currentYear = 2025;
     private final UserScheduleRepository userScheduleRepository;
+    private final UserGeneralScheduleRepository userGeneralScheduleRepository;
 
     public List<ScheduleDTO> getAllSchedules(String grade) {
         List<ScheduleEntity> scheduleEntityList = scheduleRepository.findAll();
@@ -44,18 +40,21 @@ public class ScheduleService {
         return scheduleDTOList;
     }
 
-    public List<ScheduleDTO> getUserSchedules(String email) {
+    public List<ScheduleTimeDTO> getUserSchedules(String email) {
         UserEntity userEntity = userService.getLoginUserByEmail(email);
         List<UserScheduleEntity> userScheduleEntityList = userScheduleRepository.findAllByUserEntity(userEntity);
-        List<ScheduleDTO> scheduleDTOList = new ArrayList<>();
+        List<UserGeneralScheduleEntity> userGeneralScheduleEntityList = userGeneralScheduleRepository.findAllByUserEntity(userEntity);
+        List<ScheduleTimeDTO> scheduleTimeDTOList = new ArrayList<>();
 
-        HashMap<SubjectScheduleKey, ScheduleDTO> map = new HashMap<>();
+        HashMap<SubjectScheduleKey, ScheduleTimeDTO> map = new HashMap<>();
         for (UserScheduleEntity userScheduleEntity : userScheduleEntityList) {
             ScheduleEntity scheduleEntity = userScheduleEntity.getScheduleEntity();
-            extractSchedules(map, scheduleEntity);
+            extractSchedulesTime(map, scheduleEntity);
         }
-        for (SubjectScheduleKey key : map.keySet()) scheduleDTOList.add(map.get(key));
-        return scheduleDTOList;
+        for (UserGeneralScheduleEntity userGeneralScheduleEntity : userGeneralScheduleEntityList)
+            extractGeneralSchedulesTime(map, userGeneralScheduleEntity);
+        for (SubjectScheduleKey key : map.keySet()) scheduleTimeDTOList.add(map.get(key));
+        return scheduleTimeDTOList;
     }
 
     @Transactional
@@ -81,9 +80,34 @@ public class ScheduleService {
                         UserScheduleEntity userScheduleEntity = optionalUserSchedule.get();
                         userScheduleRepository.delete(userScheduleEntity);
                     }
+                    else throw new RestApiException(CustomErrorCode.INVALID_PARAMETER);
                 }
                 else throw new RestApiException(CustomErrorCode.INVALID_PARAMETER); // 잘못된 상태값
             }
+        }
+    }
+
+    @Transactional
+    public void updateGeneralSchedules(String email, List<GeneralScheduleUpdateRequest> generalScheduleUpdateList) {
+        UserEntity userEntity = userService.getLoginUserByEmail(email);
+        for (GeneralScheduleUpdateRequest generalScheduleUpdate : generalScheduleUpdateList) {
+            List<UserGeneralScheduleEntity> userGeneralScheduleEntityList = userGeneralScheduleRepository
+                    .findAllByUserEntityAndName(userEntity, generalScheduleUpdate.getName());
+            if (generalScheduleUpdate.getStatus().equals(ScheduleUpdateStatus.ADD.toString())) {
+                if (userGeneralScheduleEntityList.isEmpty()) {
+                    generalScheduleUpdate.getTimeList().forEach(time -> {
+                        UserGeneralScheduleEntity userGeneralScheduleEntity = UserGeneralScheduleEntity.toUserGeneralScheduleEntity(
+                                userEntity, generalScheduleUpdate.getName(), time);
+                        userGeneralScheduleRepository.save(userGeneralScheduleEntity);
+                    });
+                }
+            }
+            else if (generalScheduleUpdate.getStatus().equals(ScheduleUpdateStatus.DELETE.toString())) {
+                if (!userGeneralScheduleEntityList.isEmpty())
+                    userGeneralScheduleRepository.deleteAll(userGeneralScheduleEntityList);
+                else throw new RestApiException(CustomErrorCode.INVALID_PARAMETER);
+            }
+            else throw new RestApiException(CustomErrorCode.INVALID_PARAMETER); // 잘못된 상태값
         }
     }
 
@@ -95,10 +119,25 @@ public class ScheduleService {
 
     public void extractSchedules(HashMap<SubjectScheduleKey, ScheduleDTO> map, ScheduleEntity scheduleEntity) {
         SubjectEntity subjectEntity = scheduleEntity.getSubjectEntity();
-        SubjectScheduleKey key = new SubjectScheduleKey(subjectEntity, scheduleEntity.getClassNumber());
+        SubjectScheduleKey key = new SubjectScheduleKey(subjectEntity.getName(), scheduleEntity.getClassNumber());
         ClassroomDTO classroomDTO = ClassroomDTO.toClassroomDTO(scheduleEntity.getTime(), scheduleEntity.getRoom());
 
         map.putIfAbsent(key, ScheduleDTO.toScheduleDTO(subjectEntity, getSubjectType(subjectEntity), scheduleEntity, new ArrayList<>()));
         map.get(key).getClassroomList().add(classroomDTO);
+    }
+
+    public void extractSchedulesTime(HashMap<SubjectScheduleKey, ScheduleTimeDTO> map, ScheduleEntity scheduleEntity) {
+        SubjectEntity subjectEntity = scheduleEntity.getSubjectEntity();
+        SubjectScheduleKey key = new SubjectScheduleKey(subjectEntity.getName(), scheduleEntity.getClassNumber());
+
+        map.putIfAbsent(key, ScheduleTimeDTO.toScheduleTimeDTO(subjectEntity.getName(), new ArrayList<>()));
+        map.get(key).getTimeList().add(scheduleEntity.getTime());
+    }
+
+    public void extractGeneralSchedulesTime(HashMap<SubjectScheduleKey, ScheduleTimeDTO> map, UserGeneralScheduleEntity userGeneralScheduleEntity) {
+        SubjectScheduleKey key = new SubjectScheduleKey(userGeneralScheduleEntity.getName(), 0);
+
+        map.putIfAbsent(key, ScheduleTimeDTO.toScheduleTimeDTO(userGeneralScheduleEntity.getName(), new ArrayList<>()));
+        map.get(key).getTimeList().add(userGeneralScheduleEntity.getTime());
     }
 }

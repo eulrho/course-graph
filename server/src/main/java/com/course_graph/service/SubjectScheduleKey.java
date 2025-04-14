@@ -7,7 +7,7 @@ import java.util.Objects;
 
 @AllArgsConstructor
 public class SubjectScheduleKey {
-    private SubjectEntity subjectEntity;
+    private String name;
     private int classNumber;
 
     @Override
@@ -16,11 +16,11 @@ public class SubjectScheduleKey {
         if (!(o instanceof SubjectScheduleKey)) return false;
         SubjectScheduleKey that = (SubjectScheduleKey) o;
         return classNumber == that.classNumber &&
-                Objects.equals(subjectEntity, that.subjectEntity);
+                Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(subjectEntity, classNumber);
+        return Objects.hash(name, classNumber);
     }
 }

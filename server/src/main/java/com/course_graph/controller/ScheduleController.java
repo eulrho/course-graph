@@ -1,8 +1,6 @@
 package com.course_graph.controller;
 
-import com.course_graph.dto.CommonResponse;
-import com.course_graph.dto.ScheduleDTO;
-import com.course_graph.dto.ScheduleUpdateRequest;
+import com.course_graph.dto.*;
 import com.course_graph.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,14 +22,20 @@ public class ScheduleController {
     }
 
     @GetMapping("/api/schedule")
-    public ResponseEntity<List<ScheduleDTO>> getUserSchedules(Authentication auth) {
-        List<ScheduleDTO> scheduleDTOList = scheduleService.getUserSchedules(auth.getName());
+    public ResponseEntity<List<ScheduleTimeDTO>> getUserSchedules(Authentication auth) {
+        List<ScheduleTimeDTO> scheduleDTOList = scheduleService.getUserSchedules(auth.getName());
         return new ResponseEntity<>(scheduleDTOList, HttpStatus.OK);
     }
 
     @PostMapping("/api/schedule")
     public ResponseEntity<CommonResponse> updateUserSchedules(@RequestBody List<ScheduleUpdateRequest> scheduleUpdateList, Authentication auth) {
         scheduleService.updateSchedules(auth.getName(), scheduleUpdateList);
+        return new ResponseEntity<>(new CommonResponse("수정 사항이 반영되었습니다."), HttpStatus.OK);
+    }
+
+    @PostMapping("/api/schedule-general")
+    public ResponseEntity<CommonResponse> updateUserGeneralSchedules(@RequestBody List<GeneralScheduleUpdateRequest> generalScheduleUpdateList, Authentication auth) {
+        scheduleService.updateGeneralSchedules(auth.getName(), generalScheduleUpdateList);
         return new ResponseEntity<>(new CommonResponse("수정 사항이 반영되었습니다."), HttpStatus.OK);
     }
 }
