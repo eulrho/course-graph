@@ -5,16 +5,12 @@ import com.course_graph.dto.*;
 import com.course_graph.entity.*;
 import com.course_graph.enums.CustomErrorCode;
 import com.course_graph.enums.ScheduleUpdateStatus;
-import com.course_graph.enums.Type;
 import com.course_graph.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -23,9 +19,10 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final SubjectTypeRepository subjectTypeRepository;
     private final UserService userService;
-    private final int currentYear = 2025;
     private final UserScheduleRepository userScheduleRepository;
     private final UserGeneralScheduleRepository userGeneralScheduleRepository;
+    private final RecommendationService recommendationService;
+    private final ExtractScheduleData extractScheduleData;
 
     public List<ScheduleDTO> getAllSchedules(String grade) {
         List<ScheduleEntity> scheduleEntityList = scheduleRepository.findAll();
@@ -34,7 +31,7 @@ public class ScheduleService {
         HashMap<SubjectScheduleKey, ScheduleDTO> map = new HashMap<>();
         for (ScheduleEntity scheduleEntity : scheduleEntityList) {
             if (!scheduleEntity.getSubjectEntity().getGrade().equals(grade)) continue;
-            extractSchedules(map, scheduleEntity);
+            extractScheduleData.extractSchedules(map, scheduleEntity);
         }
         for (SubjectScheduleKey key : map.keySet()) scheduleDTOList.add(map.get(key));
         return scheduleDTOList;
@@ -49,10 +46,10 @@ public class ScheduleService {
         HashMap<SubjectScheduleKey, ScheduleTimeDTO> map = new HashMap<>();
         for (UserScheduleEntity userScheduleEntity : userScheduleEntityList) {
             ScheduleEntity scheduleEntity = userScheduleEntity.getScheduleEntity();
-            extractSchedulesTime(map, scheduleEntity);
+            extractScheduleData.extractSchedulesTime(map, scheduleEntity);
         }
         for (UserGeneralScheduleEntity userGeneralScheduleEntity : userGeneralScheduleEntityList)
-            extractGeneralSchedulesTime(map, userGeneralScheduleEntity);
+            extractScheduleData.extractGeneralSchedulesTime(map, userGeneralScheduleEntity);
         for (SubjectScheduleKey key : map.keySet()) scheduleTimeDTOList.add(map.get(key));
         return scheduleTimeDTOList;
     }
@@ -111,33 +108,12 @@ public class ScheduleService {
         }
     }
 
-    public Type getSubjectType(SubjectEntity subjectEntity) {
-        Optional<SubjectTypeEntity> optionalSubjectType = subjectTypeRepository
-                .findBySubjectEntityAndEndedAtGreaterThan(subjectEntity, currentYear);
-        return optionalSubjectType.get().getType();
-    }
-
-    public void extractSchedules(HashMap<SubjectScheduleKey, ScheduleDTO> map, ScheduleEntity scheduleEntity) {
-        SubjectEntity subjectEntity = scheduleEntity.getSubjectEntity();
-        SubjectScheduleKey key = new SubjectScheduleKey(subjectEntity.getName(), scheduleEntity.getClassNumber());
-        ClassroomDTO classroomDTO = ClassroomDTO.toClassroomDTO(scheduleEntity.getTime(), scheduleEntity.getRoom());
-
-        map.putIfAbsent(key, ScheduleDTO.toScheduleDTO(subjectEntity, getSubjectType(subjectEntity), scheduleEntity, new ArrayList<>()));
-        map.get(key).getClassroomList().add(classroomDTO);
-    }
-
-    public void extractSchedulesTime(HashMap<SubjectScheduleKey, ScheduleTimeDTO> map, ScheduleEntity scheduleEntity) {
-        SubjectEntity subjectEntity = scheduleEntity.getSubjectEntity();
-        SubjectScheduleKey key = new SubjectScheduleKey(subjectEntity.getName(), scheduleEntity.getClassNumber());
-
-        map.putIfAbsent(key, ScheduleTimeDTO.toScheduleTimeDTO(subjectEntity.getName(), new ArrayList<>()));
-        map.get(key).getTimeList().add(scheduleEntity.getTime());
-    }
-
-    public void extractGeneralSchedulesTime(HashMap<SubjectScheduleKey, ScheduleTimeDTO> map, UserGeneralScheduleEntity userGeneralScheduleEntity) {
-        SubjectScheduleKey key = new SubjectScheduleKey(userGeneralScheduleEntity.getName(), 0);
-
-        map.putIfAbsent(key, ScheduleTimeDTO.toScheduleTimeDTO(userGeneralScheduleEntity.getName(), new ArrayList<>()));
-        map.get(key).getTimeList().add(userGeneralScheduleEntity.getTime());
+    public List<ScheduleRecommendResponse> recommendSchedules(String email, ScheduleRecommendRequest scheduleRecommendRequest) {
+        UserEntity userEntity = userService.getLoginUserByEmail(email);
+        List<String> grades = new ArrayList<>(Arrays.asList("1학년", "2학년", "3학년", "4학년"));
+        if (!grades.contains(scheduleRecommendRequest.getGrade())) {
+            throw new RestApiException(CustomErrorCode.INVALID_PARAMETER);
+        }
+        return recommendationService.getRecommendation(scheduleRecommendRequest, userEntity);
     }
 }

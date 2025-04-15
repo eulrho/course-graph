@@ -38,4 +38,10 @@ public class ScheduleController {
         scheduleService.updateGeneralSchedules(auth.getName(), generalScheduleUpdateList);
         return new ResponseEntity<>(new CommonResponse("수정 사항이 반영되었습니다."), HttpStatus.OK);
     }
+
+    @PostMapping("/api/recommend-schedules")
+    public ResponseEntity<List<ScheduleRecommendResponse>> recommendSchedules(@RequestBody ScheduleRecommendRequest scheduleRecommendRequest, Authentication auth) {
+        List<ScheduleRecommendResponse> scheduleRecommendList = scheduleService.recommendSchedules(auth.getName(), scheduleRecommendRequest);
+        return new ResponseEntity<>(scheduleRecommendList, HttpStatus.OK);
+    }
 }
