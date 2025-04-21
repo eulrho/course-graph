@@ -260,7 +260,7 @@ public class FileService {
                 List<SubjectTypeEntity> subjectTypeEntityList = subjectTypeRepository.findAllBySubjectEntityOrderByEndedAtDesc(subjectEntity);
                 SubjectTypeEntity subjectTypeEntity = subjectTypeEntityList.get(0);
 
-                if (subjectTypeEntity.getType().equals(type.name())) // 이수구분 유지
+                if (subjectTypeEntity.getType()== type) // 이수구분 유지
                     subjectTypeEntity.extendEndedAt(year + 1);
                 else { // 이수구분 변경
                     SubjectTypeEntity newSubjectTypeEntity = SubjectTypeEntity.toSubjectTypeEntity(subjectEntity, type, year, year + 1);

@@ -88,11 +88,11 @@ public class CourseService {
             SubjectTypeEntity subjectTypeEntity = optionalSubjectType.get();
 
             if (isTakenSubject(subjectEntity, userEntity)) { // 수강 학점 계산
-                if (subjectTypeEntity.getType().equals(Type.MAJOR_REQUIRED.toString()))
+                if (subjectTypeEntity.getType() == Type.MAJOR_REQUIRED)
                     totalRequiredCredit += subjectEntity.getCredit();
                 else totalElectiveCredit += subjectEntity.getCredit();
             } else { // 미이수 전공필수 과목 리스트에 추가
-                if (subjectTypeEntity.getType().equals(Type.MAJOR_REQUIRED.toString())
+                if (subjectTypeEntity.getType() == Type.MAJOR_REQUIRED
                         && !isTakenSubject(getOriginalSubject(subjectEntity), userEntity))
                     notTakenRequiredSubjects.add(subjectEntity.getName());
             }
@@ -105,7 +105,7 @@ public class CourseService {
                     .findBySubjectEntityAndEndedAtGreaterThan(takenSubjectEntity, userEntity.getYear());
             SubjectTypeEntity subjectTypeEntity = optionalSubjectType.get();
             if (takenSubjectEntity.getDeletedAt() <= currentYear) { // 폐강된 과목 수강 학점 계산
-                if (subjectTypeEntity.getType().equals(Type.MAJOR_REQUIRED.toString()))
+                if (subjectTypeEntity.getType() == Type.MAJOR_REQUIRED)
                     totalRequiredCredit += takenSubjectEntity.getCredit();
                 else totalElectiveCredit += takenSubjectEntity.getCredit();
             }
