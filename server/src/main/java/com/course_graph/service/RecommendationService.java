@@ -2,14 +2,8 @@ package com.course_graph.service;
 
 import com.course_graph.Exception.RestApiException;
 import com.course_graph.chatGPT.ChatGPTPromptBuilder;
-import com.course_graph.dto.ScheduleDTO;
-import com.course_graph.dto.ScheduleRecommendRequest;
-import com.course_graph.dto.ScheduleRecommendResponse;
-import com.course_graph.dto.ScheduleTimeDTO;
-import com.course_graph.entity.ScheduleEntity;
-import com.course_graph.entity.UserEntity;
-import com.course_graph.entity.UserGeneralScheduleEntity;
-import com.course_graph.entity.UserScheduleEntity;
+import com.course_graph.dto.*;
+import com.course_graph.entity.*;
 import com.course_graph.enums.CustomErrorCode;
 import com.course_graph.repository.HistoryRepository;
 import com.course_graph.repository.ScheduleRepository;
@@ -33,17 +27,16 @@ public class RecommendationService {
     private final ScheduleRepository scheduleRepository;
     private final ExtractScheduleData extractScheduleData;
 
-    public List<ScheduleRecommendResponse> getGptReply(List<ScheduleDTO> schedules, List<ScheduleTimeDTO> generalSchedules, int targetCredit) {
+    public List<ChatGPTReplyDTO> getGptReply(List<ScheduleDTO> schedules, List<ScheduleTimeDTO> generalSchedules, int targetCredit) {
         String prompt = ChatGPTPromptBuilder.buildSchedulePrompt(schedules, generalSchedules, targetCredit);
         String gptReply = gptService.callChatGpt(prompt);
         System.out.println("GPT Reply: " + gptReply);
         try {
             ObjectMapper mapper = new ObjectMapper();
 
-            List<ScheduleRecommendResponse> responses = mapper.readValue(
-                    gptReply, new TypeReference<List<ScheduleRecommendResponse>>() {}
+            return mapper.readValue(
+                    gptReply, new TypeReference<>() {}
             );
-            return responses;
         }
         catch (Exception e) {
             e.printStackTrace(); // 전체 에러 스택 출력
@@ -67,22 +60,28 @@ public class RecommendationService {
         // 일반 스케줄
         List<ScheduleTimeDTO> generalSchedules = getGeneralScheduleTime(userEntity);
         // 추천 스케줄
-        List<ScheduleDTO> candidates = getCandidateSchedules(request.getGrade(), excludeSubjectIds);
+        List<ScheduleEntity> candidateEntity = scheduleRepository.findAllBySubjectGradeAndSubjectIdNotIn(request.getGrade(), excludeSubjectIds);
+        List<ScheduleDTO> candidateDTO = getCandidateSchedules(candidateEntity);
 
         int currentCredit = calculateCredit(currentSchedules);
         int targetCredit = request.getTargetCredit() - currentCredit;
         if (targetCredit < 0) {
             throw new RestApiException(CustomErrorCode.INVALID_PARAMETER);
         }
-        List<ScheduleRecommendResponse> responses = getGptReply(candidates, generalSchedules, targetCredit);
-        // 기존 시간표 정보 삽입
-        responses.forEach(response -> {
-            int totalCredit = response.getTotalCredit() + currentCredit;
-            response.setTotalCredit(totalCredit);
-            response.getSchedule().addAll(getScheduleTime(currentSchedules));
-            response.getSchedule().addAll(generalSchedules);
-        });
-        return responses;
+
+        List<ChatGPTReplyDTO> chatGPTResponses = getGptReply(candidateDTO, generalSchedules, targetCredit);
+        List<ScheduleRecommendResponse> recommendResponses = new ArrayList<>();
+
+        for (ChatGPTReplyDTO response : chatGPTResponses) {
+            ScheduleRecommendResponse recommendResponse = ScheduleRecommendResponse.toScheduleRecommendResponse(
+                    getCurrentMajorScheduleTime(currentSchedules),
+                    generalSchedules,
+                    currentCredit
+            );
+            addMajorScheduleTime(response.getSchedules(), candidateEntity, recommendResponse);
+            recommendResponses.add(recommendResponse);
+        }
+        return recommendResponses;
     }
 
     public List<ScheduleTimeDTO> getGeneralScheduleTime(UserEntity userEntity) {
@@ -95,8 +94,7 @@ public class RecommendationService {
         return scheduleTimeDTOList;
     }
 
-    public List<ScheduleDTO> getCandidateSchedules(String grade, Set<Long> excludeSubjectIds) {
-        List<ScheduleEntity> candidates = scheduleRepository.findAllBySubjectGradeAndSubjectIdNotIn(grade, excludeSubjectIds);
+    public List<ScheduleDTO> getCandidateSchedules(List<ScheduleEntity> candidates) {
         List<ScheduleDTO> candidateDTO = new ArrayList<>();
         HashMap<SubjectScheduleKey, ScheduleDTO> map = new HashMap<>();
         for (ScheduleEntity scheduleEntity : candidates)
@@ -113,12 +111,32 @@ public class RecommendationService {
         return totalCredit;
     }
 
-    public List<ScheduleTimeDTO> getScheduleTime(List<ScheduleEntity> currentSchedules) {
-        List<ScheduleTimeDTO> scheduleTimeDTOList = new ArrayList<>();
-        HashMap<SubjectScheduleKey, ScheduleTimeDTO> generalMap = new HashMap<>();
-        for (ScheduleEntity scheduleEntity : currentSchedules)
-            extractScheduleData.extractSchedulesTime(generalMap, scheduleEntity);
-        for (SubjectScheduleKey key : generalMap.keySet()) scheduleTimeDTOList.add(generalMap.get(key));
-        return scheduleTimeDTOList;
+    public void addMajorScheduleTime(List<SubjectScheduleKey> keys, List<ScheduleEntity> candidateEntity, ScheduleRecommendResponse recommendResponse) {
+        List<MajorScheduleTimeDTO> majorScheduleTimeDTOList = new ArrayList<>();
+        HashMap<SubjectScheduleKey, MajorScheduleTimeDTO> map = new HashMap<>();
+        for (SubjectScheduleKey key : keys) map.put(key, null);
+
+        int totalCredit = 0;
+        for (ScheduleEntity scheduleEntity : candidateEntity)
+            totalCredit += extractScheduleData.extractMajorSchedulesTime(map, scheduleEntity);
+        for (SubjectScheduleKey key : map.keySet()) majorScheduleTimeDTOList.add(map.get(key));
+        recommendResponse.getSchedules().addAll(majorScheduleTimeDTOList);
+        recommendResponse.setTotalCredit(recommendResponse.getTotalCredit() + totalCredit);
+    }
+
+    public List<MajorScheduleTimeDTO> getCurrentMajorScheduleTime(List<ScheduleEntity> currentSchedules) {
+        List<MajorScheduleTimeDTO> majorScheduleTimeDTOList = new ArrayList<>();
+        HashMap<SubjectScheduleKey, MajorScheduleTimeDTO> map = new HashMap<>();
+
+        // 기존 시간표 추가
+        for (ScheduleEntity scheduleEntity : currentSchedules) {
+            SubjectEntity subjectEntity = scheduleEntity.getSubjectEntity();
+            SubjectScheduleKey key = new SubjectScheduleKey(subjectEntity.getName(), scheduleEntity.getClassNumber());
+
+            map.putIfAbsent(key, MajorScheduleTimeDTO.toMajorScheduleTimeDTO(scheduleEntity, new ArrayList<>()));
+            map.get(key).getTimeList().add(scheduleEntity.getTime());
+        }
+        for (SubjectScheduleKey key : map.keySet()) majorScheduleTimeDTOList.add(map.get(key));
+        return majorScheduleTimeDTOList;
     }
 }

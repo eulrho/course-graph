@@ -1,6 +1,7 @@
 package com.course_graph.service;
 
 import com.course_graph.dto.ClassroomDTO;
+import com.course_graph.dto.MajorScheduleTimeDTO;
 import com.course_graph.dto.ScheduleDTO;
 import com.course_graph.dto.ScheduleTimeDTO;
 import com.course_graph.entity.ScheduleEntity;
@@ -44,6 +45,19 @@ public class ExtractScheduleData {
 
         map.putIfAbsent(key, ScheduleTimeDTO.toScheduleTimeDTO(userGeneralScheduleEntity.getName(), new ArrayList<>()));
         map.get(key).getTimeList().add(userGeneralScheduleEntity.getTime());
+    }
+
+    public int extractMajorSchedulesTime(HashMap<SubjectScheduleKey, MajorScheduleTimeDTO> map, ScheduleEntity scheduleEntity) {
+        SubjectEntity subjectEntity = scheduleEntity.getSubjectEntity();
+        SubjectScheduleKey key = new SubjectScheduleKey(subjectEntity.getName(), scheduleEntity.getClassNumber());
+
+        int credit = scheduleEntity.getSubjectEntity().getCredit();
+        if (!map.containsKey(key)) return 0;
+        if (map.get(key) == null)
+            map.put(key, MajorScheduleTimeDTO.toMajorScheduleTimeDTO(scheduleEntity, new ArrayList<>()));
+        else credit = 0;
+        map.get(key).getTimeList().add(scheduleEntity.getTime());
+        return credit;
     }
 
     private Type getSubjectType(SubjectEntity subjectEntity) {

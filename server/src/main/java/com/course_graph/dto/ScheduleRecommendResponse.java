@@ -12,6 +12,15 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ScheduleRecommendResponse {
-    private List<ScheduleTimeDTO> schedule;
+    private List<MajorScheduleTimeDTO> schedules;
+    private List<ScheduleTimeDTO> generalSubjects;
     private int totalCredit;
+
+    public static ScheduleRecommendResponse toScheduleRecommendResponse(List<MajorScheduleTimeDTO> schedules, List<ScheduleTimeDTO> generalSubjects, int totalCredit) {
+        ScheduleRecommendResponse scheduleRecommendResponse = new ScheduleRecommendResponse();
+        scheduleRecommendResponse.setSchedules(schedules);
+        scheduleRecommendResponse.setGeneralSubjects(generalSubjects);
+        scheduleRecommendResponse.setTotalCredit(totalCredit);
+        return scheduleRecommendResponse;
+    }
 }
