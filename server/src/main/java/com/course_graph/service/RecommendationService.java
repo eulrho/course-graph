@@ -105,8 +105,12 @@ public class RecommendationService {
 
     public int calculateCredit(List<ScheduleEntity> scheduleList) {
         int totalCredit = 0;
+        List<SubjectEntity> completedSubject = new ArrayList<>();
         for (ScheduleEntity schedule : scheduleList) {
+            if (completedSubject.contains(schedule.getSubjectEntity())) continue;
+
             totalCredit += schedule.getSubjectEntity().getCredit();
+            completedSubject.add(schedule.getSubjectEntity());
         }
         return totalCredit;
     }
@@ -114,11 +118,13 @@ public class RecommendationService {
     public void addMajorScheduleTime(List<SubjectScheduleKey> keys, List<ScheduleEntity> candidateEntity, ScheduleRecommendResponse recommendResponse) {
         List<MajorScheduleTimeDTO> majorScheduleTimeDTOList = new ArrayList<>();
         HashMap<SubjectScheduleKey, MajorScheduleTimeDTO> map = new HashMap<>();
-        for (SubjectScheduleKey key : keys) map.put(key, null);
+        for (SubjectScheduleKey key : keys) {
+            map.put(key, null);
+        }
 
         int totalCredit = 0;
-        for (ScheduleEntity scheduleEntity : candidateEntity)
-            totalCredit += extractScheduleData.extractMajorSchedulesTime(map, scheduleEntity);
+        for (ScheduleEntity schedule : candidateEntity)
+            totalCredit += extractScheduleData.extractMajorSchedulesTime(map, schedule);
         for (SubjectScheduleKey key : map.keySet()) majorScheduleTimeDTOList.add(map.get(key));
         recommendResponse.getSchedules().addAll(majorScheduleTimeDTOList);
         recommendResponse.setTotalCredit(recommendResponse.getTotalCredit() + totalCredit);
@@ -131,7 +137,7 @@ public class RecommendationService {
         // 기존 시간표 추가
         for (ScheduleEntity scheduleEntity : currentSchedules) {
             SubjectEntity subjectEntity = scheduleEntity.getSubjectEntity();
-            SubjectScheduleKey key = new SubjectScheduleKey(subjectEntity.getName(), scheduleEntity.getClassNumber());
+            SubjectScheduleKey key = new SubjectScheduleKey(subjectEntity.getCode(), scheduleEntity.getClassNumber());
 
             map.putIfAbsent(key, MajorScheduleTimeDTO.toMajorScheduleTimeDTO(scheduleEntity, new ArrayList<>()));
             map.get(key).getTimeList().add(scheduleEntity.getTime());

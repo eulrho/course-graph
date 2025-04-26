@@ -25,7 +25,7 @@ public class ExtractScheduleData {
 
     public void extractSchedules(HashMap<SubjectScheduleKey, ScheduleDTO> map, ScheduleEntity scheduleEntity) {
         SubjectEntity subjectEntity = scheduleEntity.getSubjectEntity();
-        SubjectScheduleKey key = new SubjectScheduleKey(subjectEntity.getName(), scheduleEntity.getClassNumber());
+        SubjectScheduleKey key = new SubjectScheduleKey(subjectEntity.getCode(), scheduleEntity.getClassNumber());
         ClassroomDTO classroomDTO = ClassroomDTO.toClassroomDTO(scheduleEntity.getTime(), scheduleEntity.getRoom());
 
         map.putIfAbsent(key, ScheduleDTO.toScheduleDTO(subjectEntity, getSubjectType(subjectEntity), scheduleEntity, new ArrayList<>()));
@@ -34,7 +34,7 @@ public class ExtractScheduleData {
 
     public void extractSchedulesTime(HashMap<SubjectScheduleKey, ScheduleTimeDTO> map, ScheduleEntity scheduleEntity) {
         SubjectEntity subjectEntity = scheduleEntity.getSubjectEntity();
-        SubjectScheduleKey key = new SubjectScheduleKey(subjectEntity.getName(), scheduleEntity.getClassNumber());
+        SubjectScheduleKey key = new SubjectScheduleKey(subjectEntity.getCode(), scheduleEntity.getClassNumber());
 
         map.putIfAbsent(key, ScheduleTimeDTO.toScheduleTimeDTO(subjectEntity.getName(), new ArrayList<>()));
         map.get(key).getTimeList().add(scheduleEntity.getTime());
@@ -49,7 +49,7 @@ public class ExtractScheduleData {
 
     public int extractMajorSchedulesTime(HashMap<SubjectScheduleKey, MajorScheduleTimeDTO> map, ScheduleEntity scheduleEntity) {
         SubjectEntity subjectEntity = scheduleEntity.getSubjectEntity();
-        SubjectScheduleKey key = new SubjectScheduleKey(subjectEntity.getName(), scheduleEntity.getClassNumber());
+        SubjectScheduleKey key = new SubjectScheduleKey(subjectEntity.getCode(), scheduleEntity.getClassNumber());
 
         int credit = scheduleEntity.getSubjectEntity().getCredit();
         if (!map.containsKey(key)) return 0;

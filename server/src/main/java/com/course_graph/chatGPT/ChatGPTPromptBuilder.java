@@ -14,24 +14,28 @@ public class ChatGPTPromptBuilder {
         StringBuilder sb = new StringBuilder();
 
         sb.append("You are a university course schedule assistant.\n\n");
-        sb.append("Your goal is to recommend up to two combinations of subject schedules whose total credits are as close as possible to the target.\n");
+        sb.append("Your goal is to recommend up to two combinations of subject schedules.\n");
         sb.append("Each combination must satisfy the following constraints:\n");
         sb.append("1. Classes must not overlap in time.\n");
         sb.append("2. The user's existing non-major schedule must not conflict with any new schedule.\n");
-        sb.append("3. A subject (same name) should appear only once in a combination, even if it has multiple classNumbers.\n");
-        sb.append("   For example, if a subject named '캡스톤디자인' exists with multiple classNumbers, select only one.\n");
+        sb.append("3. A subject (same code) should appear only once in a combination, even if it has multiple classNumbers.\n");
         sb.append("4. Do not include more than one schedule with the same subject name in a single combination.\n");
         sb.append("5. Return at most two combinations.\n\n");
 
         sb.append("Target credit: ").append(targetCredit).append("\n\n");
+
+        sb.append("Important Instructions:\n");
+        sb.append("- If possible, prioritize combinations whose total credits exactly match the target.\n");
+        sb.append("- If an exact match is impossible, select the largest total credit without exceeding the target.\n");
+        sb.append("- Try to maximize total credit while respecting all constraints.\n\n");
 
         sb.append("Here is the list of available subject schedules:\n");
         sb.append("[");
         for (int i = 0; i < schedules.size(); i++) {
             ScheduleDTO dto = schedules.get(i);
             sb.append("{\n");
-            sb.append("  \"name\": \"").append(dto.getName()).append("\",\n");
-            sb.append("  \"credit\": \"").append(dto.getName()).append("\",\n");
+            sb.append("  \"code\": \"").append(dto.getCode()).append("\",\n");
+            sb.append("  \"credit\": \"").append(dto.getCredit()).append("\",\n");
             sb.append("  \"classNumber\": \"").append(dto.getClassNumber()).append("\"\n");
             sb.append("}");
             if (i != schedules.size() - 1) sb.append(",\n");
@@ -61,7 +65,7 @@ public class ChatGPTPromptBuilder {
         sb.append("  {\n");
         sb.append("    \"schedules\": [\n");
         sb.append("      {\n");
-        sb.append("        \"name\": \"...\",\n");
+        sb.append("        \"code\": \"...\",\n");
         sb.append("        \"classNumber\": ...\n");
         sb.append("      },\n");
         sb.append("      ...\n");
