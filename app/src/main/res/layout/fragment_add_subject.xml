@@ -68,7 +68,7 @@
         android:id="@+id/btn_add_subject"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="과목 추가하기"
+        android:text="반영하기"
         android:layout_gravity="end"
         android:textSize="12sp" />
 

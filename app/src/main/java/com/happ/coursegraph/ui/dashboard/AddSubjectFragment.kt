@@ -1,27 +1,31 @@
 package com.happ.coursegraph.ui.dashboard
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
+import com.happ.coursegraph.MainActivity
+import com.happ.coursegraph.R
+import com.happ.coursegraph.data.Course
 import com.happ.coursegraph.databinding.FragmentAddSubjectBinding
 
 class AddSubjectFragment : Fragment() {
 
+    // FIXME: 1. 이미 check 되어있는 과목들도 중복해서 반영됨  
     private var _binding: FragmentAddSubjectBinding? = null
     private val binding get() = _binding!!
 
-    private val allSubjects = mapOf(
-        "1학년" to listOf("미래설계탐색", "미래설계준비"),
-        "2학년" to listOf("오픈소스소프트웨어 이해와 실습"),
-        "3학년" to listOf("심화코딩", "자료구조"),
-        "4학년" to listOf("AI캡스톤디자인", "졸업프로젝트")
-    )
+    private val majorViewModel: MajorStatusViewModel by viewModels({ requireActivity() })
+
+    private val subjectMap = mutableMapOf<String, MutableList<SubjectStatus>>() // 학년별 과목 맵
     private var currentYear = "1학년"
-    private val selectedSubjects = mutableSetOf<String>()
+
     private lateinit var adapter: ArrayAdapter<String>
 
     override fun onCreateView(
@@ -34,54 +38,119 @@ class AddSubjectFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        init()
+        setEvent()
+    }
 
+    private fun init() {
         adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_multiple_choice)
         binding.listSubjects.adapter = adapter
         binding.listSubjects.choiceMode = android.widget.ListView.CHOICE_MODE_MULTIPLE
 
-        // 학년 버튼
-        binding.btnGrade1.setOnClickListener { updateSubjectList("1학년") }
-        binding.btnGrade2.setOnClickListener { updateSubjectList("2학년") }
-        binding.btnGrade3.setOnClickListener { updateSubjectList("3학년") }
-        binding.btnGrade4.setOnClickListener { updateSubjectList("4학년") }
+        majorViewModel.getSubjectOfGrade("1학년")
+    }
+
+    private fun setEvent() {
+        observeViewModel()
+
+        binding.btnGrade1.setOnClickListener {
+            majorViewModel.getSubjectOfGrade("1학년")
+            updateSubjectList("1학년")
+        }
+        binding.btnGrade2.setOnClickListener {
+            majorViewModel.getSubjectOfGrade("2학년")
+            updateSubjectList("2학년")
+        }
+        binding.btnGrade3.setOnClickListener {
+            majorViewModel.getSubjectOfGrade("3학년")
+            updateSubjectList("3학년")
+        }
+        binding.btnGrade4.setOnClickListener {
+            majorViewModel.getSubjectOfGrade("4학년")
+            updateSubjectList("4학년")
+        }
 
         binding.btnClose.setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .remove(this@AddSubjectFragment)
-                .commit()
+            findNavController().navigate(R.id.action_navigation_add_subject_to_navigation_dashboard)
+
+            (requireActivity() as MainActivity).setVisibilityBottomNav(true)
+            (requireActivity() as MainActivity).setVisibilityHideButton(true)
         }
 
-        // 과목 추가 버튼
         binding.btnAddSubject.setOnClickListener {
             val checkedItems = binding.listSubjects.checkedItemPositions
-            val currentSubjects = allSubjects[currentYear] ?: emptyList()
+            val currentSubjects = subjectMap[currentYear] ?: emptyList()
 
-            for (i in 0 until checkedItems.size()) {
-                val position = checkedItems.keyAt(i)
-                if (checkedItems.valueAt(i)) {
-                    selectedSubjects.add(currentSubjects[position])
-                }
+            val selectedSubjectList = mutableListOf<SubjectStatus>()
+
+            for (i in 0 until currentSubjects.size) {
+                val subject = currentSubjects[i]
+                val isChecked = checkedItems.get(i, false)
+
+                val status = if (isChecked) "TAKEN" else "NOT_TAKEN"
+                selectedSubjectList.add(SubjectStatus(subject.name, currentYear, status))
             }
 
-            Toast.makeText(requireContext(), "추가된 과목: ${selectedSubjects.joinToString()}", Toast.LENGTH_SHORT).show()
-            parentFragmentManager.beginTransaction()
-                .remove(this@AddSubjectFragment)
-                .commit()
+            // ViewModel로 전송 (서버에도 업로드)
+            majorViewModel.postSubjects(selectedSubjectList)
+
+            // 리사이클러뷰에 반영할 데이터도 추가
+            val addedCourses = selectedSubjectList
+                .filter { it.status == "TAKEN" }
+                .map { Course(it.name, "") }
+
+            majorViewModel.addCourses(addedCourses)
+
+
+            findNavController().navigate(R.id.action_navigation_add_subject_to_navigation_dashboard)
+
+            (requireActivity() as MainActivity).setVisibilityBottomNav(true)
+            (requireActivity() as MainActivity).setVisibilityHideButton(true)
         }
 
-        // 초기 과목 리스트
-        updateSubjectList("1학년")
+    }
+
+    private fun observeViewModel() {
+        majorViewModel.subjectStatusList.observe(viewLifecycleOwner) { list ->
+            // 학년별로 분류하여 Map에 저장
+            subjectMap.clear()
+            list.forEach {
+                val grade = it.grade
+                if (subjectMap[grade] == null) {
+                    subjectMap[grade] = mutableListOf()
+                }
+                subjectMap[grade]?.add(it)
+            }
+
+            updateSubjectList(currentYear) // 초기 로딩 시 학년별 과목 표시
+        }
+
+        majorViewModel.isChanged.observe(viewLifecycleOwner) { res ->
+            if (res == true) {
+                parentFragmentManager.beginTransaction()
+                    .remove(this@AddSubjectFragment)
+                    .commit()
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "과목 추가 실패",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
 
     private fun updateSubjectList(year: String) {
         currentYear = year
-        val subjects = allSubjects[year] ?: emptyList()
-        adapter.clear()
-        adapter.addAll(subjects)
+        val subjects = subjectMap[year] ?: emptyList()
 
-        // 체크 상태 반영
+        adapter.clear()
+        adapter.addAll(subjects.map { it.name })
+
+        // 체크 상태는 status가 TAKEN이면 체크되도록 설정
         for (i in subjects.indices) {
-            binding.listSubjects.setItemChecked(i, selectedSubjects.contains(subjects[i]))
+            val isChecked = subjects[i].status == "TAKEN"
+            binding.listSubjects.setItemChecked(i, isChecked)
         }
     }
 
@@ -90,3 +159,4 @@ class AddSubjectFragment : Fragment() {
         _binding = null
     }
 }
+

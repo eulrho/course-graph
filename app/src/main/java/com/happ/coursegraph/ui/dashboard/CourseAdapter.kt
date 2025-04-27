@@ -1,9 +1,12 @@
 package com.happ.coursegraph.ui.dashboard
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.TextView
+import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.RecyclerView
 import com.happ.coursegraph.R
 import com.happ.coursegraph.data.Course
@@ -14,7 +17,7 @@ class CourseAdapter : RecyclerView.Adapter<CourseAdapter.CourseViewHolder>() {
 
     inner class CourseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvName: TextView = itemView.findViewById(R.id.tvSubjectName)
-        val tvGrade: TextView = itemView.findViewById(R.id.tvGrade)
+        val tvGrade: EditText = itemView.findViewById(R.id.edGrade)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CourseViewHolder {
@@ -25,9 +28,33 @@ class CourseAdapter : RecyclerView.Adapter<CourseAdapter.CourseViewHolder>() {
 
     override fun onBindViewHolder(holder: CourseViewHolder, position: Int) {
         val course = courseList[position]
+
         holder.tvName.text = course.name
-        holder.tvGrade.text = course.grade
+
+        // 기존 리스너 제거 후 텍스트 설정
+        if (holder.tvGrade.tag != null) {
+            (holder.tvGrade.tag as? android.text.TextWatcher)?.let {
+                holder.tvGrade.removeTextChangedListener(it)
+            }
+        }
+
+        holder.tvGrade.setText(course.grade)
+
+        // 새로운 TextWatcher 설정
+        val watcher = object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                course.grade = s.toString()
+                Log.i("##INFO", "grade changed = ${course.grade}")
+            }
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        }
+
+        holder.tvGrade.addTextChangedListener(watcher)
+        holder.tvGrade.tag = watcher // 재사용 시 중복 리스너 제거 위해 tag에 저장
     }
+
+
     fun getCurrentList(): List<Course> {
         return courseList
     }

@@ -79,7 +79,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/bt_check_auth_number"
-                android:text="전송" />
+                android:text="확인" />
 
         </LinearLayout>
 
@@ -146,7 +146,7 @@
             android:layout_marginEnd="16dp"
             android:orientation="horizontal">
 
-            <androidx.appcompat.widget.AppCompatButton
+            <Button
                 android:id="@+id/bt_cancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -160,8 +160,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="가입하기"
-                android:enabled="false"
                 android:textColor="@color/black" />
+
+
 
         </LinearLayout>
 

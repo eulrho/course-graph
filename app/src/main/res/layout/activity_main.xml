@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
+    android:background="@color/white"
     android:layout_height="match_parent">
 
     <!-- 메인 컨텐츠 -->
@@ -39,9 +40,10 @@
         <ImageButton
             android:id="@+id/imbt_side_open"
             android:layout_width="40dp"
+            android:layout_marginTop="10dp"
             android:layout_height="40dp"
             android:background="@mipmap/ic_launcher"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="10dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>

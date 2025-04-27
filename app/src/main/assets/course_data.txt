@@ -1,0 +1,456 @@
+[
+    {
+        "data": {
+            "subjectName": "창업산학초청세미나Ⅰ",
+            "tracks": [],
+            "grade": "4학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "회로이론 I",
+            "tracks": [
+                "지능형시스템"
+            ],
+            "grade": "2학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "공학수학 I",
+            "tracks": [],
+            "grade": "2학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "회로실험 I",
+            "tracks": [
+                "지능형시스템"
+            ],
+            "grade": "2학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "디지털공학",
+            "tracks": [
+                "자율주행차 V2X 통신시스템"
+            ],
+            "grade": "2학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "전자회로 I",
+            "tracks": [
+                "자율주행차 V2X 통신시스템",
+                "지능형시스템"
+            ],
+            "grade": "3학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "통신공학",
+            "tracks": [],
+            "grade": "3학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "자료구조",
+            "tracks": [],
+            "grade": "3학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "데이터통신설계",
+            "tracks": [],
+            "grade": "3학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "신호 및 시스템",
+            "tracks": [
+                "지능형시스템"
+            ],
+            "grade": "3학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "자바프로그래밍",
+            "tracks": [],
+            "grade": "3학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "정보통신개론",
+            "tracks": [],
+            "grade": "2학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "전자기학",
+            "tracks": [],
+            "grade": "2학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "오픈소스 기초프로젝트",
+            "tracks": [],
+            "grade": "2학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "오픈소스 전문프로젝트",
+            "tracks": [],
+            "grade": "3학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "캡스톤디자인",
+            "tracks": [
+                "지능형시스템"
+            ],
+            "grade": "4학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "임베디드IoT응용실험",
+            "tracks": [
+                "지능형시스템"
+            ],
+            "grade": "4학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "지능형네트워크",
+            "tracks": [],
+            "grade": "4학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "운영체제",
+            "tracks": [],
+            "grade": "3학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "객체지향 프로그래밍(C++)",
+            "tracks": [],
+            "grade": "2학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "미래설계탐색",
+            "tracks": [],
+            "grade": "1학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "창업산학초청세미나Ⅱ",
+            "tracks": [
+                "지능형시스템"
+            ],
+            "grade": "4학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "회로실험 II",
+            "tracks": [
+                "지능형시스템"
+            ],
+            "grade": "2학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "확률및통계",
+            "tracks": [],
+            "grade": "2학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "회로이론 II",
+            "tracks": [
+                "지능형시스템"
+            ],
+            "grade": "2학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "공학수학 II",
+            "tracks": [],
+            "grade": "2학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "전자회로Ⅱ",
+            "tracks": [
+                "지능형시스템"
+            ],
+            "grade": "3학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "디지털통신",
+            "tracks": [],
+            "grade": "3학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "컴퓨터네트워크",
+            "tracks": [
+                "지능형시스템"
+            ],
+            "grade": "2학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "인터넷통신설계",
+            "tracks": [],
+            "grade": "3학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "디지털신호처리설계",
+            "tracks": [
+                "자율주행차 V2X 통신시스템"
+            ],
+            "grade": "3학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "무선통신망공학",
+            "tracks": [],
+            "grade": "4학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "임베디드소프트웨어실습",
+            "tracks": [],
+            "grade": "2학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "모바일프로그래밍및실습",
+            "tracks": [],
+            "grade": "3학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "안테나설계",
+            "tracks": [],
+            "grade": "3학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "딥러닝이론및실습",
+            "tracks": [
+                "자율주행차 V2X 통신시스템",
+                "지능형시스템"
+            ],
+            "grade": "4학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "오픈소스 개발프로젝트",
+            "tracks": [
+                "지능형시스템"
+            ],
+            "grade": "2학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "산학프로젝트(종합설계)",
+            "tracks": [
+                "지능형시스템"
+            ],
+            "grade": "3학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "빅데이터시스템설계",
+            "tracks": [],
+            "grade": "3학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "창업파일럿프로젝트(종합설계)",
+            "tracks": [],
+            "grade": "4학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "지능형영상처리",
+            "tracks": [],
+            "grade": "3학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "고급컴퓨터프로그래밍",
+            "tracks": [],
+            "grade": "2학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "마이크로프로세서",
+            "tracks": [
+                "지능형시스템"
+            ],
+            "grade": "3학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "고주파시스템공학",
+            "tracks": [
+                "지능형시스템"
+            ],
+            "grade": "3학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "지능형시스템",
+            "tracks": [
+                "지능형시스템"
+            ],
+            "grade": "4학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "VLSI설계및실습",
+            "tracks": [
+                "지능형시스템"
+            ],
+            "grade": "4학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "전자통신실험",
+            "tracks": [
+                "지능형시스템"
+            ],
+            "grade": "3학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "SoC설계및실습",
+            "tracks": [
+                "지능형시스템"
+            ],
+            "grade": "4학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "인공지능입문",
+            "tracks": [],
+            "grade": "4학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "지능형통신공학",
+            "tracks": [],
+            "grade": "4학년"
+        },
+        "status": "NOT_TAKEN"
+    },
+    {
+        "data": {
+            "subjectName": "정보·컴퓨터논리및논술",
+            "tracks": [],
+            "grade": "4학년"
+        },
+        "status": "NOT_TAKEN"
+    }
+]
