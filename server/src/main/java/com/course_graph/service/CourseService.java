@@ -82,16 +82,17 @@ public class CourseService {
         int totalRequiredCredit = 0, totalElectiveCredit = 0;
         List<String> notTakenRequiredSubjects = new ArrayList<>();
         List<SubjectEntity> subjectEntityList = subjectRepository.findAllByDeletedAtGreaterThan(currentYear);
-        for (SubjectEntity subjectEntity : subjectEntityList) {
+        for (SubjectEntity subjectEntity : subjectEntityList) { // 현재 개설 돼있는 과목 기준 탐색
             Optional<SubjectTypeEntity> optionalSubjectType = subjectTypeRepository
                     .findBySubjectEntityAndEndedAtGreaterThan(subjectEntity, userEntity.getYear());
-            SubjectTypeEntity subjectTypeEntity = optionalSubjectType.get();
+            if (optionalSubjectType.isEmpty()) continue; // 입학 연도에 존재하지 않았던 과목 제외
 
+            SubjectTypeEntity subjectTypeEntity = optionalSubjectType.get();
             if (isTakenSubject(subjectEntity, userEntity)) { // 수강 학점 계산
                 if (subjectTypeEntity.getType() == Type.MAJOR_REQUIRED)
                     totalRequiredCredit += subjectEntity.getCredit();
                 else totalElectiveCredit += subjectEntity.getCredit();
-            } else { // 미이수 전공필수 과목 리스트에 추가
+            } else { // 미이수 전공 필수 과목 리스트에 추가
                 if (subjectTypeEntity.getType() == Type.MAJOR_REQUIRED
                         && !isTakenSubject(getOriginalSubject(subjectEntity), userEntity))
                     notTakenRequiredSubjects.add(subjectEntity.getName());

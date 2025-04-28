@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_dialog_round"
+    android:padding="20dp"
+    android:gravity="center"
+    android:elevation="6dp">
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="아래의 방법으로 다운로드 한\n.xlsx 파일을 업로드 해주세요."
+        android:textColor="#000000"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="12dp" />
+
+    <TextView
+        android:id="@+id/tv_guide"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="• 파일 다운로드 방법\n  계산누리 학생서비스메뉴 → 고지/졸업\n  → 졸업학점이수현황(학) → 출력\n  → 엑셀파일로 저장"
+        android:textColor="#333333"
+        android:textSize="14sp"
+        android:lineSpacingExtra="4dp"
+        android:layout_marginBottom="16dp" />
+
+    <Button
+        android:id="@+id/btn_go_site"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:text="계산누리로 바로가기 ↗"
+        android:backgroundTint="#E0E0E0"
+        android:layout_gravity="end"
+        android:textColor="#000000"
+        android:textSize="8sp"
+        android:layout_marginBottom="12dp" />
+
+    <Button
+        android:id="@+id/btn_close"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="닫기"
+        android:backgroundTint="#D6D6D6"
+        android:textColor="#000000"
+        android:textSize="14sp" />
+</LinearLayout>

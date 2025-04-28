@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_home">
+
+    <fragment
+        android:id="@+id/navigation_home"
+        android:name="com.happ.coursegraph.ui.home.HomeFragment"
+        android:label="@string/title_home"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/navigation_dashboard"
+        android:name="com.happ.coursegraph.ui.dashboard.MajorStatusFragment"
+        android:label="@string/title_dashboard"
+        tools:layout="@layout/fragment_major" >
+        <action
+            android:id="@+id/action_navigation_dashboard_to_navigation_add_subject"
+            app:destination="@id/navigation_add_subject" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_timetalbe"
+        android:name="com.happ.coursegraph.ui.timetable.TimetableFragment"
+        android:label="@string/title_notifications"
+        tools:layout="@layout/fragment_timetable" >
+        <action
+            android:id="@+id/action_navigation_timetalbe_to_navigation_timetable_compare"
+            app:destination="@id/navigation_timetable_compare" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_add_subject"
+        android:name="com.happ.coursegraph.ui.dashboard.AddSubjectFragment"
+        tools:layout="@layout/fragment_add_subject" >
+        <action
+            android:id="@+id/action_navigation_add_subject_to_navigation_dashboard"
+            app:destination="@id/navigation_dashboard" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_timetable_compare"
+        android:name="com.happ.coursegraph.ui.timetable.TimeTableCompareFragment"
+        tools:layout="@layout/fragment_timetable_compare" >
+
+        <action
+            android:id="@+id/action_navigation_timetable_compare_to_navigation_timetalbe"
+            app:destination="@id/navigation_timetalbe" />
+    </fragment>
+
+</navigation>
