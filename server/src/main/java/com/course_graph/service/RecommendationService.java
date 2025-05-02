@@ -72,6 +72,14 @@ public class RecommendationService {
         List<ChatGPTReplyDTO> chatGPTResponses = getGptReply(candidateDTO, generalSchedules, targetCredit);
         List<ScheduleRecommendResponse> recommendResponses = new ArrayList<>();
 
+        if (chatGPTResponses.isEmpty()) {
+            ScheduleRecommendResponse recommendResponse = ScheduleRecommendResponse.toScheduleRecommendResponse(
+                    getCurrentMajorScheduleTime(currentSchedules),
+                    generalSchedules,
+                    currentCredit
+            );
+            recommendResponses.add(recommendResponse);
+        }
         for (ChatGPTReplyDTO response : chatGPTResponses) {
             ScheduleRecommendResponse recommendResponse = ScheduleRecommendResponse.toScheduleRecommendResponse(
                     getCurrentMajorScheduleTime(currentSchedules),
