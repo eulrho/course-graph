@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.happ.coursegraph.MainActivity
@@ -20,7 +21,7 @@ class TimeTableCompareFragment : Fragment() {
     private var grade: String? = null
     private var targetCredit: Int = 0
 
-    private val timeViewmodel: TimeTableViewModel by viewModels()
+    private val timeViewmodel: TimeTableViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

@@ -34,6 +34,9 @@ class HomeViewModel : ViewModel() {
 
         for (i in 0 until jsonArray.length()) {
             val obj = jsonArray.getJSONObject(i)
+
+            val status = obj.optString("status", "NOT_TAKEN")
+
             val data = obj.getJSONObject("data")
             val subjectName = data.getString("subjectName")
             val gradeStr = data.getString("grade")
@@ -41,12 +44,13 @@ class HomeViewModel : ViewModel() {
 
             val tracks = data.optJSONArray("tracks")
             val trackList = mutableListOf<String>()
+
             if (tracks != null && tracks.length() > 0) {
                 for (j in 0 until tracks.length()) {
                     trackList.add(tracks.getString(j))
                 }
             } else {
-                trackList.add("전공필수") // 기본값
+                trackList.add("전공필수") // tracks가 비었으면 기본값
             }
 
             trackList.forEach { track ->
@@ -54,11 +58,14 @@ class HomeViewModel : ViewModel() {
                     RadialGraphView.Course(
                         name = subjectName,
                         category = track,
-                        grade = grade
+                        grade = grade,
+                        status = status
                     )
                 )
             }
         }
+
         _courseData.postValue(courseList)
     }
+
 }
