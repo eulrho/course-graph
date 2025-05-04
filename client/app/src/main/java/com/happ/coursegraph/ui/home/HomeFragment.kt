@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -51,21 +52,43 @@ class HomeFragment : Fragment() {
         if (token != null) {
             homeViewModel.getCourseData(token)
         }
-        binding.btMajorRequired.setOnClickListener {
-            binding.radialGraph.setCategory("전공필수")
-        }
-
-        binding.btIntelligentIot.setOnClickListener {
-            binding.radialGraph.setCategory("지능형시스템")
-        }
-
-        binding.btMicroDegree.setOnClickListener {
-            binding.radialGraph.setCategory("마이크로디그리")
-        }
+//        binding.btMajorRequired.setOnClickListener {
+//            binding.radialGraph.setCategory("전공필수")
+//        }
+//
+//        binding.btIntelligentIot.setOnClickListener {
+//            binding.radialGraph.setCategory("지능형시스템")
+//        }
+//
+//        binding.btMicroDegree.setOnClickListener {
+//            binding.radialGraph.setCategory("마이크로디그리")
+//        }
     }
 
     private fun observeViewModel() {
         homeViewModel.courseData.observe(viewLifecycleOwner) { courseList ->
+            // track 이름들만 추출
+            val allTracks = mutableSetOf<String>()
+            courseList.forEach { course ->
+                if (course.category.isNotEmpty()) {
+                    allTracks.add(course.category)
+                }
+            }
+
+            // 기존 버튼 지우고 새로 추가
+            binding.layoutCategory.removeAllViews()
+
+            allTracks.forEach { trackName ->
+                val button = Button(requireContext()).apply {
+                    text = trackName
+                    setOnClickListener {
+                        binding.radialGraph.setCategory(trackName)
+                    }
+                }
+                binding.layoutCategory.addView(button)
+            }
+
+            // RadialGraphView에 데이터 세팅
             binding.radialGraph.setCourses(courseList)
         }
     }

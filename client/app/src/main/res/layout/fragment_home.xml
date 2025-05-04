@@ -12,36 +12,14 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="50dp"
         android:layout_marginEnd="16dp"
-        android:id="@+id/layout_category"
+        android:id="@+id/horizontal_scroll"
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
+            android:id="@+id/layout_category"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/bt_major_required"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:text="전공필수" />
-
-
-            <Button
-                android:id="@+id/bt_intelligent_iot"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:text="지능형시스템" />
-
-            <Button
-                android:id="@+id/bt_micro_degree"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:text="마이크로디그리" />
 
 
         </LinearLayout>
@@ -53,6 +31,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layout_category" />
+        app:layout_constraintTop_toBottomOf="@id/horizontal_scroll" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

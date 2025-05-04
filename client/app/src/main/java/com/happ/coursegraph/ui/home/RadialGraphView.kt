@@ -8,7 +8,7 @@ import kotlin.math.*
 import kotlin.random.Random
 
 class RadialGraphView(context: Context, attrs: AttributeSet?) : View(context, attrs) {
-
+    private val categoryColors = mutableMapOf<String, Int>()
     private val paintCircle = Paint().apply {
         color = Color.LTGRAY
         style = Paint.Style.STROKE
@@ -31,14 +31,9 @@ class RadialGraphView(context: Context, attrs: AttributeSet?) : View(context, at
         val name: String,
         val category: String,
         val grade: Int,
+        val status: String, // 추가됨!
         var x: Float? = null,
         var y: Float? = null
-    )
-
-    private val categoryColors = mapOf(
-        "전공필수" to Color.parseColor("#888A2BE2"),
-        "마이크로디그리" to Color.parseColor("#88FFD700"),
-        "지능형시스템" to Color.parseColor("#88FF4500")
     )
 
     private var selectedCategory: String? = null
@@ -46,10 +41,27 @@ class RadialGraphView(context: Context, attrs: AttributeSet?) : View(context, at
 
     fun setCourses(data: List<Course>) {
         courseMap.clear()
+
+        // 기존 데이터 정리
+        categoryColors.clear()
+
+        // 새로운 데이터 세팅
         data.groupBy { it.grade }.forEach { (grade, courses) ->
             courseMap[grade] = courses.toMutableList()
+
+            // 트랙 별로 랜덤 색상 지정
+            courses.forEach { course ->
+                if (course.category.isNotEmpty() && course.category !in categoryColors) {
+                    categoryColors[course.category] = generateRandomColor()
+                }
+            }
         }
         invalidate()
+    }
+
+    private fun generateRandomColor(): Int {
+        val rnd = Random(System.currentTimeMillis())
+        return Color.argb(136, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)) // 88 = 반투명
     }
 
     fun setCategory(category: String) {
@@ -59,12 +71,13 @@ class RadialGraphView(context: Context, attrs: AttributeSet?) : View(context, at
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+
         val centerX = width / 2f
         val centerY = height / 2f
         val maxRadius = min(width, height) * 0.4f
         val radiusStep = maxRadius / 4
 
-        // 원 그리기 (1학년 ~ 4학년)
+        // 1~4학년 원 그리기
         for (i in 1..4) {
             canvas.drawCircle(centerX, centerY, i * radiusStep, paintCircle)
         }
@@ -80,25 +93,31 @@ class RadialGraphView(context: Context, attrs: AttributeSet?) : View(context, at
                 course.x = x
                 course.y = y
 
-                val isInCategory = course.category.trim() == selectedCategory?.trim()
-
-                paintNode.color = if (isInCategory) {
-                    categoryColors[course.category.trim()] ?: Color.LTGRAY
-                } else {
-                    Color.LTGRAY
+                // --- 노드 색 설정 ---
+                paintNode.color = when {
+                    course.status == "TAKEN" -> Color.parseColor("#4488FF") // TAKEN은 항상 파란색
+                    selectedCategory == null -> Color.LTGRAY                  // 선택 안 했으면 회색
+                    course.category.trim() == selectedCategory?.trim() -> categoryColors[course.category.trim()] ?: Color.LTGRAY
+                    else -> Color.LTGRAY
                 }
 
                 canvas.drawCircle(x, y, 40f, paintNode)
 
-                paintText.color = if (isInCategory) Color.BLACK else Color.DKGRAY
+                // --- 텍스트 색 설정 ---
+                paintText.color = when {
+                    course.status == "TAKEN" -> Color.BLACK   // TAKEN이면 텍스트도 검정
+                    selectedCategory != null && course.category.trim() == selectedCategory?.trim() -> Color.BLACK
+                    else -> Color.DKGRAY
+                }
                 paintText.textSize = 18f
 
-                val words = course.name.chunked(6)  // 최대 6자씩 자르기
+                val words = course.name.chunked(6)
                 words.take(2).forEachIndexed { i, line ->
                     canvas.drawText(line, x, y + (i * 18f), paintText)
                 }
             }
         }
     }
+
 
 }

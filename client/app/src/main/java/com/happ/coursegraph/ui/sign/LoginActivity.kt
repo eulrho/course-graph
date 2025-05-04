@@ -44,6 +44,10 @@ class LoginActivity : AppCompatActivity() {
 
         init()
         setEvent()
+
+//        binding.edEmail.setText("qkekshdmf777@chungbuk.ac.kr")
+//        binding.edPassword.setText("1234")
+//        binding.btLogin.performClick()
     }
 
     private fun init() {

@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.happ.coursegraph.MainActivity
@@ -26,7 +27,7 @@ class TimetableFragment : Fragment() {
     private val subjectMap = mutableMapOf<String, Subject>()
     private var currentGrade = "1학년"
 
-    private val timeViewmodel: TimeTableViewModel by viewModels()
+    private val timeViewmodel: TimeTableViewModel by activityViewModels()
 
     val selectedSubjectsMap = mutableMapOf<String, Boolean>() // 선택 상태 추적
     lateinit var adapter: SubjectAdapter
@@ -92,10 +93,12 @@ class TimetableFragment : Fragment() {
             if (isExist == null || isExist == false) {
                 // 서버에서 시간표 데이터 요청
                 getTimeTableSchedule()
+            } else {
+
             }
 
-            // 1학년 전체과목 요청
-            getScheduleGrade("1학년")
+//             1학년 전체과목 요청
+//            getScheduleGrade("1학년")
         }
 
         val adapter: ArrayAdapter<String> =

@@ -23,7 +23,7 @@
         android:id="@+id/tv_guide"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="• 파일 다운로드 방법\n  계산누리 학생서비스메뉴 → 고지/졸업\n  → 졸업학점이수현황(학) → 출력\n  → 엑셀파일로 저장"
+        android:text="• 파일 다운로드 방법\n  계산누리 학생서비스메뉴 → 교직/졸업\n  → 졸업학점이수현황(학) → 출력\n  → 엑셀파일로 저장"
         android:textColor="#333333"
         android:textSize="14sp"
         android:lineSpacingExtra="4dp"
