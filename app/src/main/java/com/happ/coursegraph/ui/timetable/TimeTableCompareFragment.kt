@@ -134,34 +134,48 @@ class TimeTableCompareFragment : Fragment() {
 
     private fun observedViewModel() {
         timeViewmodel.recommendSchedule.observe(viewLifecycleOwner) { recommendList ->
-            val subjects = recommendList.firstOrNull()?.schedule?.map { recommend ->
-                val timeSlots = recommend.timeList.flatMap { timeStr ->
-                    val parts = timeStr.split(" ")
-                    if (parts.size < 2) return@flatMap emptyList()
-                    val day = convertDayToEng(parts[0])
-                    val periods = parts[1].split(",").mapNotNull { it.trim().toIntOrNull() }
-                    periods.map { TimeSlot(day, it) }
-                }
-                Subject(recommend.name, timeSlots)
-            } ?: emptyList()
+            recommendList.getOrNull(0)?.let { result1 ->
+                val subjects1 = convertToSubjects(result1.schedule + result1.generalSubjects)
+                applyRecommendedSchedule(subjects1, "")
+                binding.tvScoreOne.text = "${result1.totalCredit}학점"
+            }
 
-            applyRecommendedSchedule(subjects)
+            recommendList.getOrNull(1)?.let { result2 ->
+                val subjects2 = convertToSubjects(result2.schedule + result2.generalSubjects)
+                applyRecommendedSchedule(subjects2, "_two")
+                binding.tvScoreTwo.text = "${result2.totalCredit}학점"
+            }
         }
     }
 
-    private fun applyRecommendedSchedule(scheduleList: List<Subject>) {
+
+    private fun convertToSubjects(schedule: List<RecommendSubject>): List<Subject> {
+        return schedule.map { recommend ->
+            val timeSlots = recommend.timeList.flatMap { timeStr ->
+                val parts = timeStr.split(" ")
+                if (parts.size < 2) return@flatMap emptyList()
+                val day = convertDayToEng(parts[0])
+                val periods = parts[1].split(",").mapNotNull { it.trim().toIntOrNull() }
+                periods.map { period -> TimeSlot(day, period) }
+            }
+            Subject(recommend.name, timeSlots)
+        }
+    }
+
+    private fun applyRecommendedSchedule(scheduleList: List<Subject>, suffix: String) {
         for (subject in scheduleList) {
             for (slot in subject.timeSlots) {
                 val cellId = resources.getIdentifier(
-                    "cell_${slot.day}_${slot.period}", // 예: cell_mon_3
+                    "cell_${slot.day}_${slot.period}$suffix", // 예: cell_mon_3 / cell_mon_3_two
                     "id",
                     requireContext().packageName
                 )
+
                 val cell = view?.findViewById<View>(cellId) as? TextView
                 cell?.apply {
                     text = subject.name
                     setBackgroundColor(android.graphics.Color.parseColor("#B2DFDB")) // 민트색
-                }
+                } ?: Log.w("##WARN", "Cell not found: cell_${slot.day}_${slot.period}$suffix")
             }
         }
     }

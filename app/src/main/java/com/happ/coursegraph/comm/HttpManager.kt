@@ -513,7 +513,7 @@ object HttpManager {
         token: String,
         grade: String,
         targetCredit: Int,
-        onSuccessResult: (String) -> Unit,  // ✅ 문자열 응답
+        onSuccessResult: (String) -> Unit,  // 문자열 응답
         onFailure: (String?) -> Unit
     ) {
         val obj = JSONObject().apply {

@@ -82,8 +82,10 @@ data class Classroom(
 
 data class RecommendResult(
     val schedule: List<RecommendSubject>,
+    val generalSubjects: List<RecommendSubject>,
     val totalCredit: Int
 )
+
 
 data class RecommendSubject(
     val name: String,
