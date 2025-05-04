@@ -205,6 +205,7 @@ class TimeTableViewModel : ViewModel() {
                             for (i in 0 until jsonArray.length()) {
                                 val obj = jsonArray.getJSONObject(i)
 
+                                // schedules 파싱
                                 val scheduleArray = obj.getJSONArray("schedules")
                                 val scheduleList = mutableListOf<RecommendSubject>()
 
@@ -221,9 +222,27 @@ class TimeTableViewModel : ViewModel() {
                                     scheduleList.add(RecommendSubject(name, timeList))
                                 }
 
+                                // generalSubjects 파싱
+                                val generalArray = obj.getJSONArray("generalSubjects")
+                                val generalList = mutableListOf<RecommendSubject>()
+
+                                for (j in 0 until generalArray.length()) {
+                                    val item = generalArray.getJSONObject(j)
+                                    val name = item.getString("name")
+                                    val timeListJson = item.getJSONArray("timeList")
+
+                                    val timeList = mutableListOf<String>()
+                                    for (k in 0 until timeListJson.length()) {
+                                        timeList.add(timeListJson.getString(k))
+                                    }
+
+                                    generalList.add(RecommendSubject(name, timeList))
+                                }
+
                                 val totalCredit = obj.getInt("totalCredit")
 
-                                resultList.add(RecommendResult(scheduleList, totalCredit))
+                                // RecommendResult에 generalSubjects 포함
+                                resultList.add(RecommendResult(scheduleList, generalList, totalCredit))
                             }
 
                             recommendSchedule.postValue(resultList)
@@ -239,6 +258,7 @@ class TimeTableViewModel : ViewModel() {
             }
         }
     }
+
 
     fun applyRecommendedSubjects(subjects: List<Subject>) {
         _subjects.postValue(subjects)
