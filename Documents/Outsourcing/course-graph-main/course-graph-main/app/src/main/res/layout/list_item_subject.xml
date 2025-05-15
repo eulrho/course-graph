@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <!-- 과목명 -->
+        <TextView
+            android:id="@+id/tv_subject_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="과목명"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <!-- 상세 정보 -->
+        <TextView
+            android:id="@+id/tv_subject_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="교수명 / 요일시간 / 전공필수"
+            android:textSize="11sp"
+            android:textColor="#777777" />
+    </LinearLayout>
+
+    <!-- 선택 체크박스 -->
+    <CheckBox
+        android:id="@+id/cb_select"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</LinearLayout>
