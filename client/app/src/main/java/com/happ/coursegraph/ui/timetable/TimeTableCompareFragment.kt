@@ -72,7 +72,7 @@ class TimeTableCompareFragment : Fragment() {
                 selectedSchedule?.let {
                     val subjects = it.schedule.map { recommend ->
                         val timeSlots = recommend.timeList.flatMap { timeStr ->
-                            val parts = timeStr.split(" ")
+                            val parts = timeStr.trim().split(" ", limit = 2)
                             if (parts.size < 2) return@flatMap emptyList()
                             val day = convertDayToEng(parts[0])
                             val periods = parts[1].split(",").mapNotNull { it.trim().toIntOrNull() }
@@ -152,12 +152,13 @@ class TimeTableCompareFragment : Fragment() {
     private fun convertToSubjects(schedule: List<RecommendSubject>): List<Subject> {
         return schedule.map { recommend ->
             val timeSlots = recommend.timeList.flatMap { timeStr ->
-                val parts = timeStr.split(" ")
+                val parts = timeStr.trim().split(" ", limit = 2)
                 if (parts.size < 2) return@flatMap emptyList()
                 val day = convertDayToEng(parts[0])
                 val periods = parts[1].split(",").mapNotNull { it.trim().toIntOrNull() }
                 periods.map { period -> TimeSlot(day, period) }
             }
+
             Subject(recommend.name, timeSlots)
         }
     }
